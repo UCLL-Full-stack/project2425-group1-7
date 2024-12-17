@@ -57,9 +57,16 @@ const ListDetails = () => {
         getUser();
     },[])
 
+    useEffect(()=>{
+        if (!review || !user || !album) {
+            setIsLoading(true);
+            return;
+        }
+        setIsLoading(false);
+    })
+
     useEffect(() => {
         if (!review || !user) {
-            setIsLoading(true);
             return;
         }
 
@@ -67,7 +74,6 @@ const ListDetails = () => {
         setIsLiked(!!userLiked);
         setLikeCount(review.likes.length);
         setComments(review.comments);
-        setIsLoading(false);
     }, [review, user]);
 
     useEffect(()=>{

@@ -1,7 +1,15 @@
+import { List } from "../model/list"
+import { Review } from "../model/review"
+
+export type Role = 'admin' | 'moderator' | 'user'
+
 export type UserInfo = {
     id: number,
-    email: string,
     username: string,
+    role: Role,
+    createdAt: Date,
+    reviews?: Review[],
+    lists?: List[],
 }
 
 export type ListInput = {
@@ -33,7 +41,7 @@ export type UserInput = {
 
 export type AuthResponse = {
     token: string,
-    email: string,
+    role: Role,
     id: number,
     username: string
 }

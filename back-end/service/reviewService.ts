@@ -20,17 +20,15 @@ const getReviewById = async(id: number): Promise<Review> => {
     }
 };
 
-const getUserReviews = async(id: number): Promise<Review[]> => {
+const createReview = async (newReview: ReviewInput): Promise<Review> => {
     try{
-        return await reviewDb.findUserReviews(id);  
-    }catch(e){
-        throw e;
-    }
-};
-
-const createReview = async (review: ReviewInput): Promise<Review> => {
-    try{
-        return await reviewDb.createReview(review);
+        const review = new Review({
+            title: newReview.title,
+            body: newReview.body, 
+            starRating: newReview.starRating,
+            albumId: newReview.albumId
+        });
+        return await reviewDb.createReview(review, newReview.authorId);
     }catch(e){
         throw e;
     }
@@ -60,7 +58,6 @@ const deleteReview = async (id: number) =>{
 export default{
     getAllReviews,
     getReviewById,
-    getUserReviews,
     createReview,
     deleteReview,
     likeReview

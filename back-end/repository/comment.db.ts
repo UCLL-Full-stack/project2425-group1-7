@@ -1,17 +1,16 @@
 import { Comment } from "../model/comment";
-import { CommentInput } from "../types";
 import database from "../util/database";
 
-const createComment = async (comment:CommentInput): Promise<Comment>=>{
+const createComment = async (comment: Comment, authorId: number): Promise<Comment>=>{
     try{
         const commentPrisma = await database.comment.create({
             data:{
-                body: comment.body,
+                body: comment.getBody(),
                 author: {
-                    connect: {id: comment.authorId}
+                    connect: {id: authorId}
                 },
                 review: {
-                    connect: {id: comment.reviewId}
+                    connect: {id: comment.getReview()}
                 }
             },
             include:{

@@ -3,7 +3,7 @@ import {
     Comment as CommentPrisma,
     User as UserPrisma
 } from '@prisma/client';
-import { UserInfo } from '../types';
+import { Role, UserInfo } from '../types';
 import { Comment } from './comment';
 
 export class Review{
@@ -59,8 +59,9 @@ export class Review{
             id: id,
             author: {
                 id: author.id, 
-                email: author.email,
-                username: author.username
+                role: author.role as Role,
+                username: author.username,
+                createdAt: author.createdAt
             },
             title: title,
             body: body,
@@ -114,6 +115,10 @@ export class Review{
 
     getLikes(): number[] | undefined{
         return this.likes;
+    }
+
+    getBody(): string{
+        return this.body;
     }
     
     setStarRating(starRating: number) {
