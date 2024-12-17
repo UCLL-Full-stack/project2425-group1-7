@@ -3,7 +3,7 @@ import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
-import { List, Review, User } from "@/types/index";
+import { List, Review, UserSession } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -16,13 +16,11 @@ type Props = {
 
 const Home = ({ lists, reviews }: Props) => {
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [user, setUser] = useState<User>();
+    const [user, setUser] = useState<UserSession>();
 
     useEffect(() => {
         const userString = sessionStorage.getItem("LoggedInUser");
         if (userString) {
-            setIsLoggedIn(true);
             setUser(JSON.parse(userString))
             return;
         }
@@ -35,7 +33,7 @@ const Home = ({ lists, reviews }: Props) => {
                 <title>Welcome to Yadig</title>
             </Head>
             <div className="flex flex-col h-screen">
-                <Header current="home" isLoggedIn={isLoggedIn} />
+                <Header current="home" user={user} />
                 {user && (
                     <>
                         <div className="bg-bg1 sm:p-4 lg:p-8 w-screen grid gap-3">

@@ -8,6 +8,7 @@ import userService from "@/services/userService";
 import { Album, Review, UserSession } from "@/types/index";
 import { Rating } from "@mui/material";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -99,7 +100,7 @@ const ListDetails = () => {
                 <title>{review ? (review.title + "- Yadig") : "Review Details"}</title>
             </Head>
             <div className="flex flex-col h-screen">
-                <Header current="home" isLoggedIn={isLoggedIn}/>
+                <Header current="home" user={user}/>
                 {error && (
                     <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                         <span className="text-red-800 main-font">{error}</span>
@@ -119,11 +120,15 @@ const ListDetails = () => {
                                         <h1 className="text-4xl font-bold mb-4 text-text2 truncate">{review.title}</h1>
                                         <div className="mb-4 flex gap-2">
                                         <h2 className="text-xl main-thin text-text2">By</h2>
-                                        <p className="text-xl main-font text-bg2">{review.author.username ?? 'Unknown'}</p>
+                                        <Link
+                                            href={`/profile/${review.author.id}`}
+                                            className="text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100">
+                                            {review.author.username ?? 'Unknown'}
+                                        </Link>
                                         </div>
                                     </div>
                                     <div className="m-5">
-                                        <p className="main-thin text-md text-bg2">{review.body}</p>
+                                        <p className="main-thin text-md text-bg2">{review.body}</p> 
                                     </div>
                                 </div>
                             </div>
@@ -161,7 +166,7 @@ const fetchReview = async (id: string): Promise<Review> => {
     return response.json();
 };
 
-const fetchAlbums = async (review: Review): Promise<Album> => {
+const fetchAlbums = async (review: Review | undefined): Promise<Album> => {
     if(!review){throw new Error("cannot find review")}
     const details:string[] = review.albumId.split("_");
     return await albumService.fetchAlbum(details[0], details[1]);

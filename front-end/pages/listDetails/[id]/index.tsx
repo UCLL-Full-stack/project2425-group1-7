@@ -6,6 +6,7 @@ import listService from "@/services/listService";
 import userService from "@/services/userService";
 import { Album, List, UserSession } from "@/types/index";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -14,11 +15,10 @@ const ListDetails = () => {
     const router = useRouter();
     const { id } = router.query;
 
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [user, setUser] = useState<UserSession>();
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
+    const [user, setUser] = useState<UserSession>();
     const [error, setError] = useState<string>("");
 
     const { data: list, error: listError} = useSWR<List>(
@@ -36,11 +36,10 @@ const ListDetails = () => {
             const userString = sessionStorage.getItem("LoggedInUser");
             const u = JSON.parse(userString ?? "");
             if (!userString || userService.isJwtExpired(u.token)) {
-                setIsLoggedIn(false); 
                 router.push("/login");
                 return;
             }
-            setIsLoggedIn(true);
+
             setUser({
                 id: Number(u.id),
                 email: u.email,
@@ -96,7 +95,7 @@ const ListDetails = () => {
                 <title>{list ? (list.title + "- Yadig") : "List Details"}</title>
             </Head>
             <div className="flex flex-col h-screen">
-                <Header current="home" isLoggedIn={isLoggedIn}/>
+                <Header current="home" user={user}/>
                 {error && (
                     <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                         <span className="text-red-800 main-font">{error}</span>
@@ -110,7 +109,11 @@ const ListDetails = () => {
                                 <h1 className="text-4xl font-bold mb-4 text-text2">{list?.title}</h1>
                                 <div className="mb-4 flex gap-2">
                                     <h2 className="text-xl main-thin text-text2">By</h2>
-                                    <p className="text-xl main-font text-bg2">{list.author.username ?? 'Unknown'}</p>
+                                    <Link
+                                        href={`/profile/${list.author.id}`}
+                                        className="text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100">
+                                        {list.author.username ?? 'Unknown'}
+                                    </Link>
                                 </div>
                             </div>
                             <div className="m-5">

@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
+import helmet from "helmet";
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
 import swaggerJSDoc from 'swagger-jsdoc';
@@ -13,6 +14,7 @@ const app = express();
 dotenv.config();
 const port = process.env.APP_PORT || 3000;
 
+app.use(helmet());
 app.use(cors());
 app.use(bodyParser.json());
 

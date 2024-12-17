@@ -1,3 +1,5 @@
+import { UserSession } from "@/types/index";
+import { redirect } from "next/dist/server/api-utils/index";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import IconAvatar from "./ui/avatar";
@@ -5,10 +7,10 @@ import IconLogout from "./ui/logout";
 
 type Props = {
     current: "home" | "profile" | "feed" | "discover" | "login"
-    isLoggedIn: boolean;
+    user?: UserSession;
 }
 
-const Header: React.FC<Props> = ({current, isLoggedIn}: Props) => { 
+const Header: React.FC<Props> = ({current, user}: Props) => { 
     const router = useRouter();
     const linkStyle = `text-text2 hover:text-bg3 duration-100`
     const currentStyle = `text-bg3 hover:text-bg2 duration-100`
@@ -24,7 +26,7 @@ const Header: React.FC<Props> = ({current, isLoggedIn}: Props) => {
                 <Link href="/">yadig?</Link>
             </div>
             <div className="main-font text-base sm:text-lg md:text-2xl cursor-pointer flex items-center gap-4 sm:gap-8 md:gap-10">
-            {isLoggedIn ? (
+            {user? (
                 <>
                     <Link 
                         href="/feed" 
@@ -38,15 +40,15 @@ const Header: React.FC<Props> = ({current, isLoggedIn}: Props) => {
                     >
                         Discover
                     </Link>
-                    <Link 
-                        href="/profile" 
+                    <Link
+                        href={`/profile/${user.id}`}
                         className={current=="profile"?currentStyle:linkStyle}
                     >
                         <IconAvatar width="45" height="45"/>
                     </Link>
                     <Link
                         href="/"
-                        onClick={()=>handleLogout()} 
+                        onClick={()=>handleLogout()}
                         className="text-text2 hover:text-red-500 duration-100"
                     >
                         <IconLogout width={35} height={35}/>
