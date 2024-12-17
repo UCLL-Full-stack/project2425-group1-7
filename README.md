@@ -31,4 +31,4 @@ $ npm i
 $ npm start
 ```
 
-### <Adam Benkhazzi> </Sadra Dezdar>
+### Adam Benkhazzi / Sadra Dezdar
