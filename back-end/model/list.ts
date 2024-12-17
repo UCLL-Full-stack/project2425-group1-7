@@ -2,12 +2,12 @@ import {
     List as ListPrisma,
     User as UserPrisma
 } from '@prisma/client'
-import { User } from './user';
+import { UserInfo } from '../types';
 
 export class List{
     private readonly id?: number;
     private readonly createdAt?: Date;
-    private readonly author?: User;
+    private readonly author?: UserInfo;
     private title: string;
     private description: string;
     private likes: number[];
@@ -15,7 +15,7 @@ export class List{
 
     constructor(list: {
         id?: number,
-        author?: User,
+        author?: UserInfo,
         title: string, 
         description: string,
         albumIds: string[],
@@ -41,12 +41,16 @@ export class List{
         likes,
         createdAt
     }: ListPrisma & {
-        author?: UserPrisma;
+        author: UserPrisma;
         likes?: UserPrisma[];
     }){
         return new List({
             id: id,
-            author: author?User.from(author):undefined,
+            author: {
+                id: author.id,
+                username: author.username,
+                email: author.email
+            },
             title: title,
             description: description,
             albumIds: albumIds,
@@ -73,7 +77,7 @@ export class List{
         return this.id;
     }
 
-    getAuthor(): User | undefined{
+    getAuthor(): UserInfo | undefined{
         return this.author;
     }
 

@@ -9,6 +9,7 @@ import { listRouter } from './controller/list.routes';
 import { userRouter } from './controller/user.routes';
 import { expressjwt } from 'express-jwt';
 import { reviewRouter } from './controller/review.routes';
+import { commentRouter } from './controller/comment.routes';
 
 const app = express();
 dotenv.config();
@@ -41,6 +42,7 @@ app.use(
 app.use('/users', userRouter);
 app.use('/lists', listRouter);
 app.use('/reviews', reviewRouter);
+app.use('/comments', commentRouter);
 app.use((err: Error, req: Request, res: Response, next: NextFunction)=>{
     console.log(err.message);
     res.status(400).json({status: 'application error', message: "check server Log for error details"});

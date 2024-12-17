@@ -3,28 +3,28 @@ import {
     Comment as CommentPrisma,
     User as UserPrisma
 } from '@prisma/client';
+import { UserInfo } from '../types';
 import { Comment } from './comment';
-import { User } from './user';
 
 export class Review{
     private readonly id?: number;
-    private readonly createdAt: Date;
-    private readonly author: User;
+    private readonly createdAt?: Date;
+    private readonly author?: UserInfo;
     private title: string;
     private body: string;
     private starRating: number; 
     private albumId: string;
-    private comments: Comment[];
-    private likes: number[];
+    private comments?: Comment[];
+    private likes?: number[];
 
     constructor(review: {
         id?: number,
-        author: User,
+        author?: UserInfo,
         title: string, 
         body: string,
         starRating: number,
         albumId: string,
-        createdAt: Date,
+        createdAt?: Date,
         comments?: Comment[],
         likes?: number[]
     }){
@@ -57,7 +57,11 @@ export class Review{
     }){
         return new Review({
             id: id,
-            author: User.from(author),
+            author: {
+                id: author.id, 
+                email: author.email,
+                username: author.username
+            },
             title: title,
             body: body,
             albumId: albumID,
@@ -88,7 +92,7 @@ export class Review{
         return this.id;
     }
 
-    getUser(): User{
+    getUser(): UserInfo | undefined{
         return this.author;
     }
 
@@ -104,11 +108,11 @@ export class Review{
         return this.starRating
     }
 
-    getComments(): Comment[]{
+    getComments(): Comment[] | undefined{
         return this.comments;
     }
 
-    getLikes(): number[]{
+    getLikes(): number[] | undefined{
         return this.likes;
     }
     
@@ -122,7 +126,7 @@ export class Review{
         return this.albumId;
     }
 
-    getCreatedAt(): Date{
+    getCreatedAt(): Date | undefined{
         return this.createdAt;
     }
 

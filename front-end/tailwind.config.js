@@ -24,6 +24,9 @@ module.exports = {
             'bg4': '#555',
             'text1': '#111',
             'text2': '#fff',
+        },
+        screens: {
+            'xs': '300px',
         }
     },
   },

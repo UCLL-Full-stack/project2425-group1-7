@@ -43,9 +43,9 @@ const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
 
     return (
         <div onClick={handleRedirect} 
-            className="bg-text1 lg:max-w-[25vw] md:max-w-full sm:max-w-[25vw] p-4 sm:p-5 rounded-lg shadow-lg shadow-text1 max-w-full transform transition-all duration-100 hover:scale-105">
+            className="bg-text1 min-w-[20vw] max-w-[25vw] p-4 sm:p-5 rounded-lg shadow-lg shadow-text1 transform transition-all duration-100 hover:scale-105">
             <div className="flex items-center justify-between">
-                <h2 className="text-xl sm:text-2xl main-font mb-2 text-text2">{title}</h2>
+                <h2 className="text-xl sm:text-2xl main-font mb-2 text-text2 truncate">{title}</h2>
                 {onDelete &&
                     <IconDelete 
                     className="text-bg2 hover:text-red-500 duration-100"
@@ -54,8 +54,8 @@ const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
                     />
                 }
             </div>
-            <p className="text-sm sm:text-md text-bg2 mb-3 sm:mb-4 main-font">{description}</p>
-            <p className="text-xs sm:text-sm text-bg2 mb-3 sm:mb-4 main-font">{list.author.username} {formattedDate}</p>
+            <p className="text-sm sm:text-md text-bg2 mb-3 sm:mb-4 main-font truncate">{description}</p>
+            <p className="text-xs sm:text-sm text-bg2 mb-3 sm:mb-4 main-font truncate">{list.author.username} {formattedDate}</p>
 
             <span className="text-xs sm:text-sm text-text2 main-font">Albums: {albumIds.length}</span>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">

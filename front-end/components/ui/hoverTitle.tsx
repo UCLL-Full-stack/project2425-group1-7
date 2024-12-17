@@ -23,7 +23,7 @@ const HoverTitle = ({text1, text2}: Props) => {
       <h2 
         className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${isHovered ? 'opacity-100' : 'opacity-0'} `}
       >
-          {text2}
+        {text2}
       </h2>
     </div>
   );
