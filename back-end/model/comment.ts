@@ -1,23 +1,24 @@
-import { User } from "./user";
 import { 
     Comment as CommentPrisma,
     User as UserPrisma,
 } from '@prisma/client'
+import { UserInfo } from '../types';
 
 export class Comment{
     private readonly id?: number;
-    private readonly createdAt: Date;
-    private readonly author: User;
+    private readonly createdAt?: Date;
+    private readonly author?: UserInfo;
     private body: string;
     private reviewId: number;
 
     constructor(comment: {
-        id: number
-        author: User
+        id?: number
+        author?: UserInfo
         body: string
         reviewId: number 
-        createdAt: Date
+        createdAt?: Date
     }){
+        this.validate(comment);
         this.id = comment.id;
         this.author = comment.author;
         this.reviewId = comment.reviewId;
@@ -38,9 +39,21 @@ export class Comment{
             id: id, 
             createdAt: createdAt,
             body: body,
-            author: User.from(author),
+            author: {
+                id: author.id,
+                email: author.email, 
+                username: author.username
+            },
             reviewId: reviewId
         });
+    }
+
+    validate(comment:{
+        body: string
+        reviewId: number 
+    }){
+        if(!comment.body) throw new Error('comment cannot be empty');
+        if(!comment.reviewId) throw new Error('comment must belong to a review');
     }
 
     getId(): number | undefined {
@@ -55,11 +68,11 @@ export class Comment{
         return this.reviewId;
     }
 
-    getCreatedAt(): Date{
+    getCreatedAt(): Date | undefined{
         return this.createdAt;
     }
 
-    getUser(): User{
+    getUser(): UserInfo | undefined{
         return this.author;
     }
 }

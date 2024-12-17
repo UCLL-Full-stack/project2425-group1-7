@@ -37,7 +37,7 @@ export type ReviewInput = {
 export type CommentInput = {
     authorId: number,
     body: string,
-    reviewId: Review,
+    reviewId: number,
 }
 
 export type User = {
@@ -50,7 +50,7 @@ export type User = {
     reviews: Review[]
 }
 
-export type UserSession = {
+export type UserInfo = {
     id: number,
     username: string,
     email: string,

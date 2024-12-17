@@ -1,5 +1,4 @@
-import { UserSession } from "@/types/index";
-import { redirect } from "next/dist/server/api-utils/index";
+import { UserInfo } from "@/types/index";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import IconAvatar from "./ui/avatar";
@@ -7,7 +6,7 @@ import IconLogout from "./ui/logout";
 
 type Props = {
     current: "home" | "profile" | "feed" | "discover" | "login"
-    user?: UserSession;
+    user?: UserInfo;
 }
 
 const Header: React.FC<Props> = ({current, user}: Props) => { 
@@ -21,11 +20,11 @@ const Header: React.FC<Props> = ({current, user}: Props) => {
     }
 
     return (
-        <div className="bg-text1 py-4 sm:py-6 md:py-8 px-4 sm:px-10 md:px-[10rem] flex justify-between items-center ">
-            <div className="flex items-center yadig-italic text-4xl sm:text-5xl mr-4 md:text-6xl text-text2 hover:text-bg3 duration-100 ">
+        <div className="bg-text1 sm:py-3 md:py-8 sm:px-4 md:px-16 lg:px-20 md:flex sm:grid sm:gap-4 sm:justify-center md:justify-between items-center">
+            <div className="flex justify-center sm:text-4xl md:text-6xl sm:justify-center md:justify-start items-center yadig-italic mr-4 text-text2 hover:text-bg3 duration-100 ">
                 <Link href="/">yadig?</Link>
             </div>
-            <div className="main-font text-base sm:text-lg md:text-2xl cursor-pointer flex items-center gap-4 sm:gap-8 md:gap-10">
+            <div className="main-font sm:text-md md:text-2xl cursor-pointer flex text-center items-center gap-4 sm:gap-8 md:gap-10">
             {user? (
                 <>
                     <Link 
@@ -44,14 +43,14 @@ const Header: React.FC<Props> = ({current, user}: Props) => {
                         href={`/profile/${user.id}`}
                         className={current=="profile"?currentStyle:linkStyle}
                     >
-                        <IconAvatar width="45" height="45"/>
+                        <IconAvatar width={30} height={30}/>
                     </Link>
                     <Link
                         href="/"
                         onClick={()=>handleLogout()}
                         className="text-text2 hover:text-red-500 duration-100"
                     >
-                        <IconLogout width={35} height={35}/>
+                        <IconLogout width={25} height={25}/>
                     </Link>
                 </>
             ) : (
