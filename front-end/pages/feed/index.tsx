@@ -3,7 +3,7 @@ import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
-import { List, Review, UserSession } from "@/types/index";
+import { List, Review, UserInfo } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ type Props = {
 
 const Home = ({ lists, reviews }: Props) => {
     const router = useRouter();
-    const [user, setUser] = useState<UserSession>();
+    const [user, setUser] = useState<UserInfo>();
 
     useEffect(() => {
         const userString = sessionStorage.getItem("LoggedInUser");
@@ -70,7 +70,10 @@ export const getServerSideProps = async () => {
         }
         const lists: List[] = await response.json();
 
-        reviews.sort((a, b)=>a.likes.length - b.likes.length).reverse();
+        reviews.sort((a, b)=>(
+            a.likes.length + a.comments.length) - 
+            (b.likes.length + b.comments.length)
+        ).reverse();
         lists.sort((a, b)=>a.likes.length - b.likes.length).reverse();
 
         return {props: {lists, reviews}};

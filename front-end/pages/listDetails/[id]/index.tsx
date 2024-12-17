@@ -1,10 +1,11 @@
 import AlbumCard from "@/components/album/albumCard";
 import Header from "@/components/header";
 import IconLike from "@/components/ui/like";
+import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import userService from "@/services/userService";
-import { Album, List, UserSession } from "@/types/index";
+import { Album, List, UserInfo } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -18,7 +19,8 @@ const ListDetails = () => {
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
-    const [user, setUser] = useState<UserSession>();
+    const [user, setUser] = useState<UserInfo>();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
     const { data: list, error: listError} = useSWR<List>(
@@ -51,7 +53,17 @@ const ListDetails = () => {
     },[])
 
     useEffect(()=>{
-        if(!list || !user) return;
+        if(!user || !albums){
+            setIsLoading(true);
+            return
+        }
+        setIsLoading(false);
+    }, [user, albums])
+
+    useEffect(()=>{
+        if(!list || !user) {
+            return;
+        }
         const userLiked = list.likes.find(like=> like === user.id);
         if(userLiked) setIsLiked(true);
         setLikeCount(list.likes.length);
@@ -100,10 +112,13 @@ const ListDetails = () => {
                     <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                         <span className="text-red-800 main-font">{error}</span>
                     </div>
-                )
-                }
-                {list && (
-                    <main className="flex-1 bg-bg1 p-10 overflow-y-auto">
+                )}
+                <main className="flex-1 bg-bg1 p-10 overflow-y-auto">
+                {isLoading ? (
+                    <div className="flex justify-center items-center">
+                        <IconDisc height={100} width={100}/>
+                    </div>
+                ):(list && 
                         <div className="max-w-4xl mx-auto bg-text1 p-6 rounded-lg shadow-md">
                             <div className="flex justify-between pr-6">
                                 <h1 className="text-4xl font-bold mb-4 text-text2">{list?.title}</h1>
@@ -129,15 +144,15 @@ const ListDetails = () => {
                             </span>
                             <h2 className="text-xl main-font text-center mb-2 text-text2">Albums</h2>
                             {albums && albums.length > 0 && (
-                                <div className={`w-full grid grid-cols-${albums.length>4?4:2} justify-evenly gap-4`}>
+                                <div className={`w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}>
                                     {albums.map(album=>(
-                                       <AlbumCard album={album}/>
+                                       <AlbumCard key={album.id} album={album}/>
                                     ))}
                                 </div>
                             )}
                         </div>
-                    </main>
-                )}
+                    )}
+                </main>
             </div>
         </>
     );

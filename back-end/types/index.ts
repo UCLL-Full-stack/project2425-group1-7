@@ -1,3 +1,8 @@
+export type UserInfo = {
+    id: number,
+    email: string,
+    username: string,
+}
 
 export type ListInput = {
     title: string,
