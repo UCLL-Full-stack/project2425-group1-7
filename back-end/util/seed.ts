@@ -11,10 +11,27 @@ const main = async () =>{
 
     const admin = await prisma.user.create({
         data:{
-            id:99999,
             username: "admin",
             email: "admin@yadig.com",
             password: await hash("verySecure",12),
+            role: "admin"
+        }         
+    })
+
+    const mod1 = await prisma.user.create({
+        data:{
+            username: "fr3udian",
+            email: "adam@yadig.com",
+            password: await hash("adamDaMadMod",12),
+            role: "moderator"
+        }         
+    })
+
+    const mod2 = await prisma.user.create({
+        data:{
+            username: "dezz",
+            email: "dezz@yadig.com",
+            password: await hash("dezzDaMod",12),
             role: "admin"
         }         
     })

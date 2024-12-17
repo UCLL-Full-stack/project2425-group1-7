@@ -12,7 +12,6 @@ type Props = {
 const Discover = ({albums}: Props) => {
 
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [user, setUser] = useState<User>();
 
@@ -31,11 +30,9 @@ const Discover = ({albums}: Props) => {
         if(!userString || 
            userService.isJwtExpired(JSON.parse(userString).token)
           ){
-            setIsLoggedIn(false); 
             router.push("/login");
             return;
         }
-        setIsLoggedIn(true);
 
         const id = JSON.parse(userString).id;
         fetchUser(id); 
@@ -47,7 +44,7 @@ const Discover = ({albums}: Props) => {
                 <title>Yadig</title>
             </Head>
             <div className="flex flex-col h-screen">
-                <Header current="discover" isLoggedIn={isLoggedIn}/>
+                <Header current="discover" user={user}/>
                 {error?(
                     <>
                     </>

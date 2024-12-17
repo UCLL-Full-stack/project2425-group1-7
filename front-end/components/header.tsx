@@ -1,4 +1,4 @@
-import { UserInfo } from "@/types/index";
+import { User } from "@/types/index";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import IconAvatar from "./ui/avatar";
@@ -6,7 +6,7 @@ import IconLogout from "./ui/logout";
 
 type Props = {
     current: "home" | "profile" | "feed" | "discover" | "login"
-    user?: UserInfo;
+    user?: User;
 }
 
 const Header: React.FC<Props> = ({current, user}: Props) => { 
