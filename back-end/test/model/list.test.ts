@@ -1,93 +1,165 @@
 import { List } from '../../model/list';
-import { Album } from '../../model/album';
-import { Duration } from '../../types';
-import { Artist } from '../../model/artist';
-
-const mockAlbum: Album = new Album({
-  id: 1,
-  title: 'Sample Album',
-  duration: { hours: 0, minutes: 45, seconds: 30 } as Duration,
-  artists: [new Artist({name: 'artist1'})],
-  songs: [],
-  releaseDate: new Date('2023-01-01'),
-});
+import { User } from '../../model/user';
 
 describe('List Class', () => {
+  const mockUser = new User({
+    id: 1,
+    createdAt: new Date(),
+    email: 'test@test.com',
+    username: 'testUser',
+    password: 'password12345',
+    lists: [],
+    reviews: []
+  });
+
+  const validListData = {
+    id: 1,
+    title: 'Favorite Albums',
+    description: 'A list of my favorite albums',
+    albumIds: ['1', '2', '3'],
+    author: mockUser,
+    likes: [1, 2],
+    createdAt: new Date()
+  };
+
   let list: List;
   let identicalList: List;
 
   beforeEach(() => {
-    list = new List({
-      id: 1,
-      title: 'Favorite Albums',
-      description: 'A list of my favorite albums',
-      albums: [mockAlbum],
+    list = new List(validListData);
+    identicalList = new List(validListData);
+  });
+
+  describe('Constructor and Validation', () => {
+    test('should create a list instance with all properties', () => {
+      expect(list.getId()).toBe(1);
+      expect(list.getTitle()).toBe('Favorite Albums');
+      expect(list.getDescription()).toBe('A list of my favorite albums');
+      expect(list.getAlbums()).toEqual(['1', '2', '3']);
+      expect(list.getLikes()).toEqual([1, 2]);
+      expect(list.getAuthor()).toEqual(mockUser);
+      expect(list.getCreatedAt()).toBeInstanceOf(Date);
     });
 
-    identicalList = new List({
-      id: 1,
-      title: 'Favorite Albums',
-      description: 'A list of my favorite albums',
-      albums: [mockAlbum],
+    test('should throw error if title is empty', () => {
+      expect(() => {
+        new List({
+          ...validListData,
+          title: ''
+        });
+      }).toThrow('title and description cannot be empty');
+    });
+
+    test('should throw error if description is empty', () => {
+      expect(() => {
+        new List({
+          ...validListData,
+          description: ''
+        });
+      }).toThrow('title and description cannot be empty');
+    });
+
+    test('should throw error if albumIds array is empty', () => {
+      expect(() => {
+        new List({
+          ...validListData,
+          albumIds: []
+        });
+      }).toThrow('list albumIds cannot be empty');
     });
   });
 
-  test('should create a list instance with given properties', () => {
-    expect(list.getId()).toBe(1);
-    expect(list.getTitle()).toBe('Favorite Albums');
-    expect(list.getDescription()).toBe('A list of my favorite albums');
-    expect(list.getAlbums()).toEqual([mockAlbum]);
-    expect(list.getCreatedAt()).toBeLessThanOrEqual(Date.now());
+  describe('Getters', () => {
+    test('should get title', () => {
+      expect(list.getTitle()).toBe('Favorite Albums');
+    });
+
+    test('should get description', () => {
+      expect(list.getDescription()).toBe('A list of my favorite albums');
+    });
+
+    test('should get albumIds', () => {
+      expect(list.getAlbums()).toEqual(['1', '2', '3']);
+    });
+
+    test('should get likes', () => {
+      expect(list.getLikes()).toEqual([1, 2]);
+    });
+
+    test('should get author', () => {
+      expect(list.getAuthor()).toEqual(mockUser);
+    });
+
+    test('should get createdAt', () => {
+      expect(list.getCreatedAt()).toBeInstanceOf(Date);
+    });
   });
 
-  test('should throw an error if title or description is empty', () => {
-    expect(() => {
-      new List({
-        title: '',
-        description: '',
-        albums: [mockAlbum],
+  describe('equals method', () => {
+    test('should return true for identical lists', () => {
+      expect(list.equals(identicalList)).toBeTruthy();
+    });
+
+    test('should return false for lists with different titles', () => {
+      const differentList = new List({
+        ...validListData,
+        title: 'Different Title'
       });
-    }).toThrow('title and description cannot be empty');
-  });
-
-  test('should throw an error if albums array is empty', () => {
-    expect(() => {
-      new List({
-        title: 'No Albums',
-        description: 'This list has no albums',
-        albums: [],
-      });
-    }).toThrow('list albums cannot be empty');
-  });
-
-  test('should retrieve the list title', () => {
-    expect(list.getTitle()).toBe('Favorite Albums');
-  });
-
-  test('should retrieve the list description', () => {
-    expect(list.getDescription()).toBe('A list of my favorite albums');
-  });
-
-  test('should retrieve the list of albums', () => {
-    expect(list.getAlbums()).toEqual([mockAlbum]);
-  });
-
-  test('should retrieve the created timestamp', () => {
-    expect(typeof list.getCreatedAt()).toBe('number');
-  });
-
-  test('should return true when comparing two identical lists', () => {
-    expect(list.equals(list)).toBe(true);
-  });
-
-  test('should return false when comparing two different lists', () => {
-    const differentList = new List({
-      title: 'Different List',
-      description: 'A different description',
-      albums: [mockAlbum],
+      expect(list.equals(differentList)).toBeFalsy();
     });
 
-    expect(list.equals(differentList)).toBe(false);
+    test('should return false for lists with different descriptions', () => {
+      const differentList = new List({
+        ...validListData,
+        description: 'Different description'
+      });
+      expect(list.equals(differentList)).toBeFalsy();
+    });
+
+    test('should return false for lists with different albumIds', () => {
+      const differentList = new List({
+        ...validListData,
+        albumIds: ['4', '5', '6']
+      });
+      expect(list.equals(differentList)).toBeFalsy();
+    });
+  });
+
+  describe('static from method', () => {
+    test('should create List from Prisma data', () => {
+      const prismaData = {
+        id: 1,
+        createdAt: new Date(),
+        title: 'Favorite Albums',
+        description: 'A list of my favorite albums',
+        albumIds: ['1', '2', '3'],
+        authorId: 1,
+        author: {
+          id: 1,
+          createdAt: new Date(),
+          email: 'test@test.com',
+          username: 'testUser',
+          password: 'password12345'
+        },
+        likes: [
+          {
+            id: 1,
+            createdAt: new Date(),
+            email: 'liker1@test.com',
+            username: 'liker1',
+            password: 'password12345'
+          }
+        ]
+      };
+
+      const listFromPrisma = List.from(prismaData);
+      expect(listFromPrisma).toBeInstanceOf(List);
+      expect(listFromPrisma.getId()).toBe(prismaData.id);
+      expect(listFromPrisma.getTitle()).toBe(prismaData.title);
+      expect(listFromPrisma.getDescription()).toBe(prismaData.description);
+      expect(listFromPrisma.getAlbums()).toEqual(prismaData.albumIds);
+      expect(listFromPrisma.getLikes()).toEqual([1]);
+      expect(listFromPrisma.getAuthor()).toBeInstanceOf(User);
+    });
   });
 });
-

@@ -1,4 +1,4 @@
-import { 
+import {
     Review as ReviewPrisma,
     Comment as CommentPrisma,
     User as UserPrisma
@@ -12,7 +12,7 @@ export class Review{
     private readonly author: User;
     private title: string;
     private body: string;
-    private starRating: number; 
+    private starRating: number;
     private albumId: string;
     private comments: Comment[];
     private likes: number[];
@@ -20,7 +20,7 @@ export class Review{
     constructor(review: {
         id?: number,
         author: User,
-        title: string, 
+        title: string,
         body: string,
         starRating: number,
         albumId: string,
@@ -41,19 +41,19 @@ export class Review{
     }
 
     static from({
-        id,
-        author,
-        createdAt,
-        title,
-        body,
-        starRating,
-        albumID,
-        comments,
-        likes
-    }: ReviewPrisma & {
-            comments?: (CommentPrisma & {author: UserPrisma})[];
-            likes?: UserPrisma[];
-            author: UserPrisma;
+                    id,
+                    author,
+                    createdAt,
+                    title,
+                    body,
+                    starRating,
+                    albumID,
+                    comments,
+                    likes
+                }: ReviewPrisma & {
+        comments?: (CommentPrisma & {author: UserPrisma})[];
+        likes?: UserPrisma[];
+        author: UserPrisma;
     }){
         return new Review({
             id: id,
@@ -111,7 +111,7 @@ export class Review{
     getLikes(): number[]{
         return this.likes;
     }
-    
+
     setStarRating(starRating: number) {
         if(starRating < 0 || starRating > 5)
             throw new Error('starRating should be between 0 and 5 inclusively');
