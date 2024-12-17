@@ -2,7 +2,7 @@ import {
     List as ListPrisma,
     User as UserPrisma
 } from '@prisma/client'
-import { UserInfo } from '../types';
+import { Role, UserInfo } from '../types';
 
 export class List{
     private readonly id?: number;
@@ -49,7 +49,8 @@ export class List{
             author: {
                 id: author.id,
                 username: author.username,
-                email: author.email
+                role: author.role as Role,
+                createdAt: author.createdAt
             },
             title: title,
             description: description,

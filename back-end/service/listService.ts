@@ -20,14 +20,6 @@ const getListById = async (id:number): Promise<List> => {
     }
 };
 
-const getUserLists = async (id: number): Promise<List[]> => {
-    try{
-        return await listDb.getUserLists(id)
-    }catch(e){
-        throw e;
-    }
-};
-
 const createList = async (list: ListInput): Promise<List> => {
     try{
         const newList = new List({
@@ -43,8 +35,12 @@ const createList = async (list: ListInput): Promise<List> => {
 }
 
 const likeList = async (id: number, likes: number[]): Promise<List> => {
-    const list = listDb.getById(id);
-    if(!list) throw new Error("List Doesn't exist");
+    try{
+        const list = listDb.getById(id);
+        if(!list) throw new Error("List Doesn't exist");
+    }catch(e){
+        throw e;
+    }
 
     try{
         return await listDb.likeList(id, likes);
@@ -65,7 +61,6 @@ export default {
     getLists, 
     getListById,
     createList,
-    getUserLists,
     likeList,
     deleteList
 }

@@ -23,16 +23,6 @@ reviewRouter.get("/:id", async(req: Request, res: Response, next: NextFunction)=
     }
 });
 
-reviewRouter.get("/user/:id", async(req: Request, res: Response, next: NextFunction)=>{
-    const id = Number(req.params["id"])
-    try{
-        const reviews = await reviewService.getUserReviews(id);
-        res.status(200).json(reviews);
-    }catch(e){
-        next(e);
-    }
-});
-
 reviewRouter.post("/", async(req: Request, res: Response, next: NextFunction)=>{
     try{
         const reviewInput: ReviewInput = req.body;

@@ -36,7 +36,7 @@ const Home = ({ lists, reviews, albums }: Props) => {
                 <Header current="home" user={user} />
                 <div className="bg-bg1 xs:p-4 lg:p-8 w-screen grid gap-3">
                     <span className="text-center main-font text-text2 sm:text-xl md:text-4xl">
-                        {user ? `welcome back ${user.username}` :( "welcome newcomer 👋")} 
+                        {user ? `welcome back ${user.username}` :( "welcome newcomer")} 
                     </span>
                     <span className="text-center yadig-italic text-text2 text-xl">
                         {user ? "what are you digging today?":("Log in and start Digging 🎧")}

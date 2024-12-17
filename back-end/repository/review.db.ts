@@ -1,5 +1,4 @@
 import { Review } from "../model/review";
-import { ReviewInput } from "../types";
 import database from "../util/database"
 
 const findAllReviews = async(): Promise<Review[]> => {
@@ -64,16 +63,16 @@ const findUserReviews = async(id: number): Promise<Review[]>=>{
     }
 }
 
-const createReview = async (review: ReviewInput): Promise<Review>=>{
+const createReview = async (review: Review, authorId: number): Promise<Review>=>{
     try{
         const reviewPrisma = await database.review.create({
             data:{
-                title: review.title,
-                body: review.body,
-                albumID: review.albumId,
-                starRating: review.starRating,
+                title: review.getTitle(),
+                body: review.getBody(),
+                albumID: review.getAlbum(),
+                starRating: review.getStarRating(),
                 author: {
-                    connect: {id: review.authorId}
+                    connect: {id: authorId}
                 },
             },
             include:{
