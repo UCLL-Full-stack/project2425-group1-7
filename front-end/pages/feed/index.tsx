@@ -1,6 +1,6 @@
 import Header from "@/components/header";
 import ListCard from "@/components/lists/listCard";
-import ReviewCard from "@/components/reviews/reviewCard";
+import ReviewDetails from "@/components/reviews/reviewDetails";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
@@ -38,6 +38,10 @@ const Feed = ({ lists, reviews }: Props) => {
         getUser();
     }, []);
 
+    const handleOpenReview = (id: number)=>{
+        router.push(`/reviewDetails/${id}`);
+    }
+
     if (user && user.isBlocked){
         router.push('/blocked');
     }
@@ -51,16 +55,27 @@ const Feed = ({ lists, reviews }: Props) => {
                 <Header current="feed" user={user} />
                 {user && (
                     <>
-                        <div className="bg-bg1 sm:p-4 lg:p-8 w-screen grid gap-3">
+                        <div className="bg-bg1 p-4 border-b border-bg3 w-screen grid gap-3">
                             <span className="text-center main-font text-text2 text-4xl">
-                                Explore Reviews and Lists
+                                Feed
                             </span>
                         </div>
                         <main className="flex-1 flex justify-evenly gap-4 bg-bg1 p-10 overflow-y-auto">
-                            <div className="grid justify-center gap-4">
-                                {reviews.map(review=><ReviewCard review={review} userId={user.id}/>)}
+                            <div className="flex flex-col gap-4">
+                                <span className="text-center main-font text-text2 text-4xl">
+                                    Reviews
+                                </span>
+                                {reviews.map(review=>(
+                                    <ReviewDetails 
+                                        user={user} 
+                                        review={review} 
+                                        handleClickComment={handleOpenReview}/>
+                                ))}
                             </div>
-                            <div className="grid gap-4">
+                            <div className="flex flex-col gap-4">
+                                <span className="text-center main-font text-text2 text-4xl">
+                                Lists
+                                </span>
                                 {lists.map(list=><ListCard list={list} userId={user.id}/>)}
                             </div>
                         </main>
