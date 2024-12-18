@@ -1,23 +1,20 @@
 import { List } from '../../model/list';
-import { User } from '../../model/user';
+import { UserInfo } from '../../types';
 
 describe('List Class', () => {
-  const mockUser = new User({
+  // Create mock UserInfo instead of User instance
+  const mockUserInfo: UserInfo = {
     id: 1,
-    createdAt: new Date(),
     email: 'test@test.com',
-    username: 'testUser',
-    password: 'password12345',
-    lists: [],
-    reviews: []
-  });
+    username: 'testUser'
+  };
 
   const validListData = {
     id: 1,
     title: 'Favorite Albums',
     description: 'A list of my favorite albums',
     albumIds: ['1', '2', '3'],
-    author: mockUser,
+    author: mockUserInfo,
     likes: [1, 2],
     createdAt: new Date()
   };
@@ -37,7 +34,7 @@ describe('List Class', () => {
       expect(list.getDescription()).toBe('A list of my favorite albums');
       expect(list.getAlbums()).toEqual(['1', '2', '3']);
       expect(list.getLikes()).toEqual([1, 2]);
-      expect(list.getAuthor()).toEqual(mockUser);
+      expect(list.getAuthor()).toEqual(mockUserInfo);
       expect(list.getCreatedAt()).toBeInstanceOf(Date);
     });
 
@@ -69,6 +66,7 @@ describe('List Class', () => {
     });
   });
 
+  // Getters tests remain the same except for author test
   describe('Getters', () => {
     test('should get title', () => {
       expect(list.getTitle()).toBe('Favorite Albums');
@@ -87,7 +85,7 @@ describe('List Class', () => {
     });
 
     test('should get author', () => {
-      expect(list.getAuthor()).toEqual(mockUser);
+      expect(list.getAuthor()).toEqual(mockUserInfo);
     });
 
     test('should get createdAt', () => {
@@ -95,6 +93,7 @@ describe('List Class', () => {
     });
   });
 
+  // equals method tests remain the same
   describe('equals method', () => {
     test('should return true for identical lists', () => {
       expect(list.equals(identicalList)).toBeTruthy();
@@ -159,7 +158,11 @@ describe('List Class', () => {
       expect(listFromPrisma.getDescription()).toBe(prismaData.description);
       expect(listFromPrisma.getAlbums()).toEqual(prismaData.albumIds);
       expect(listFromPrisma.getLikes()).toEqual([1]);
-      expect(listFromPrisma.getAuthor()).toBeInstanceOf(User);
+      expect(listFromPrisma.getAuthor()).toEqual({
+        id: prismaData.author.id,
+        email: prismaData.author.email,
+        username: prismaData.author.username
+      });
     });
   });
 });

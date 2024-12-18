@@ -5,13 +5,11 @@ import { AuthResponse, UserInput } from '../../types';
 import * as bcrypt from 'bcrypt';
 import { generateJWT } from '../../util/jwt';
 
-// Mock bcrypt and jwt
 jest.mock('bcrypt');
 jest.mock('../../util/jwt', () => ({
     generateJWT: jest.fn()
 }));
 
-// Create mock user
 const mockUser = new User({
     id: 1,
     createdAt: new Date(),
@@ -28,7 +26,6 @@ const mockUserInput: UserInput = {
     password: 'password12345'
 };
 
-// Setup mocks
 let findByEmailMock: jest.Mock;
 let findByIdMock: jest.Mock;
 let registerUserMock: jest.Mock;
@@ -38,12 +35,10 @@ beforeEach(() => {
     findByIdMock = jest.fn();
     registerUserMock = jest.fn();
 
-    // Setup DB mocks
     userDB.findByEmail = findByEmailMock;
     userDB.findById = findByIdMock;
     userDB.registerUser = registerUserMock;
 
-    // Clear mock calls
     (bcrypt.compare as jest.Mock).mockClear();
     (bcrypt.hash as jest.Mock).mockClear();
     (generateJWT as jest.Mock).mockClear();
@@ -82,110 +77,111 @@ describe('User Service', () => {
             // When & Then
             await expect(userService.registerUser(mockUserInput))
                 .rejects
-                .toThrowError(`user with Email ${mockUserInput.email} already exists`);
+                .toThrow(`user with Email ${mockUserInput.email} already exists`);
 
             expect(findByEmailMock).toHaveBeenCalledWith(mockUserInput.email);
         });
 
-    test('should throw error if email is empty', async () => {
-        await expect(userService.registerUser({
-            ...mockUserInput,
-            email: ''
-        })).rejects.toThrow("user fields can't be null");
+        test('should throw error if email is empty', async () => {
+            await expect(userService.registerUser({
+                ...mockUserInput,
+                email: ''
+            })).rejects.toThrow("user fields can't be null");
+        });
+
+        test('should throw error if username is empty', async () => {
+            await expect(userService.registerUser({
+                ...mockUserInput,
+                username: ''
+            })).rejects.toThrow("user fields can't be null");
+        });
+
+        test('should throw error if password is empty', async () => {
+            await expect(userService.registerUser({
+                ...mockUserInput,
+                password: ''
+            })).rejects.toThrow("user fields can't be null");
+        });
     });
 
-    test('should throw error if username is empty', async () => {
-        await expect(userService.registerUser({
-            ...mockUserInput,
-            username: ''
-        })).rejects.toThrow("user fields can't be null");
+    describe('loginUser', () => {
+        test('should login user with valid credentials', async () => {
+            findByEmailMock.mockResolvedValue(mockUser);
+            (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+            (generateJWT as jest.Mock).mockReturnValue('mockToken');
+
+            const expectedAuthResponse: AuthResponse = {
+                token: 'mockToken',
+                email: mockUser.getEmail(),
+                id: mockUser.getId(),
+                username: mockUser.getUsername()
+            };
+
+            const result = await userService.loginUser(mockUserInput);
+
+            expect(findByEmailMock).toHaveBeenCalledWith(mockUserInput.email);
+            expect(bcrypt.compare).toHaveBeenCalledWith(mockUserInput.password, mockUser.getPassword());
+            expect(generateJWT).toHaveBeenCalledWith(
+                mockUser.getEmail(),
+                mockUser.getId(),
+                mockUser.getUsername()
+            );
+            expect(result).toEqual(expectedAuthResponse);
+        });
+
+        test('should throw error if user not found', async () => {
+            findByEmailMock.mockRejectedValue(new Error('User not found'));
+
+            await expect(userService.loginUser(mockUserInput))
+                .rejects
+                .toThrow('User not found');
+        });
+
+        test('should throw error if password is incorrect', async () => {
+            findByEmailMock.mockResolvedValue(mockUser);
+            (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+            await expect(userService.loginUser(mockUserInput))
+                .rejects
+                .toThrow('Invalid Credentials');
+        });
     });
 
-    test('should throw error if password is empty', async () => {
-        await expect(userService.registerUser({
-            ...mockUserInput,
-            password: ''
-        })).rejects.toThrow("user fields can't be null");
-    });
-});
+    describe('getByEmail', () => {
+        test('should return user by email', async () => {
+            findByEmailMock.mockResolvedValue(mockUser);
 
-describe('loginUser', () => {
-    test('should login user with valid credentials', async () => {
-        findByEmailMock.mockResolvedValue(mockUser);
-        (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-        (generateJWT as jest.Mock).mockReturnValue('mockToken');
+            const result = await userService.getByEmail('test@example.com');
 
-        const expectedAuthResponse: AuthResponse = {
-            token: 'mockToken',
-            email: mockUser.getEmail(),
-            id: mockUser.getId(),
-            username: mockUser.getUsername()
-        };
+            expect(findByEmailMock).toHaveBeenCalledWith('test@example.com');
+            expect(result).toEqual(mockUser);
+        });
 
-        const result = await userService.loginUser(mockUserInput);
+        test('should throw error if user not found', async () => {
+            findByEmailMock.mockRejectedValue(new Error('User not found'));
 
-        expect(findByEmailMock).toHaveBeenCalledWith(mockUserInput.email);
-        expect(bcrypt.compare).toHaveBeenCalledWith(mockUserInput.password, mockUser.getPassword());
-        expect(generateJWT).toHaveBeenCalledWith(
-            mockUser.getEmail(),
-            mockUser.getId(),
-            mockUser.getUsername()
-        );
-        expect(result).toEqual(expectedAuthResponse);
+            await expect(userService.getByEmail('nonexistent@example.com'))
+                .rejects
+                .toThrow('User not found');
+        });
     });
 
-    test('should throw error if user not found', async () => {
-        findByEmailMock.mockRejectedValue(new Error('User not found'));
+    describe('getById', () => {
+        test('should return user by id', async () => {
+            findByIdMock.mockResolvedValue(mockUser);
 
-        await expect(userService.loginUser(mockUserInput))
-            .rejects
-            .toThrow('User not found');
-    });
+            const result = await userService.getById(1);
 
-    test('should throw error if password is incorrect', async () => {
-        findByEmailMock.mockResolvedValue(mockUser);
-        (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+            expect(findByIdMock).toHaveBeenCalledWith(1);
+            expect(result).toEqual(mockUser);
+        });
 
-        await expect(userService.loginUser(mockUserInput))
-            .rejects
-            .toThrow('Invalid Credentials');
-    });
-});
+        test('should throw error if user not found', async () => {
+            findByIdMock.mockRejectedValue(new Error('User not found'));
 
-describe('getByEmail', () => {
-    test('should return user by email', async () => {
-        findByEmailMock.mockResolvedValue(mockUser);
-
-        const result = await userService.getByEmail('test@example.com');
-
-        expect(findByEmailMock).toHaveBeenCalledWith('test@example.com');
-        expect(result).toEqual(mockUser);
-    });
-
-    test('should throw error if user not found', async () => {
-        findByEmailMock.mockRejectedValue(new Error('User not found'));
-
-        await expect(userService.getByEmail('nonexistent@example.com'))
-            .rejects
-            .toThrow('User not found');
-    });
-});
-
-describe('getById', () => {
-    test('should return user by id', async () => {
-        findByIdMock.mockResolvedValue(mockUser);
-
-        const result = await userService.getById(1);
-
-        expect(findByIdMock).toHaveBeenCalledWith(1);
-        expect(result).toEqual(mockUser);
-    });
-
-    test('should throw error if user not found', async () => {
-        findByIdMock.mockRejectedValue(new Error('User not found'));
-
-        await expect(userService.getById(999))
-            .rejects
-            .toThrow('User not found');
+            await expect(userService.getById(999))
+                .rejects
+                .toThrow('User not found');
+        });
     });
 });

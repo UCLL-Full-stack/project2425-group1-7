@@ -1,21 +1,17 @@
 import { Comment } from '../../model/comment';
-import { User } from '../../model/user';
+import { UserInfo } from '../../types';
 
 describe('Comment Class', () => {
-
-    const mockUser = new User({
+    // Create mock UserInfo instead of User instance
+    const mockUserInfo: UserInfo = {
         id: 1,
-        createdAt: new Date(),
         email: 'test@example.com',
-        username: 'testuser',
-        password: 'password12345',
-        lists: [],
-        reviews: []
-    });
+        username: 'testuser'
+    };
 
     const validCommentData = {
         id: 1,
-        author: mockUser,
+        author: mockUserInfo,
         body: 'This is a test comment',
         reviewId: 1,
         createdAt: new Date()
@@ -32,10 +28,28 @@ describe('Comment Class', () => {
     describe('Constructor', () => {
         test('should create comment instance with valid data', () => {
             expect(comment.getId()).toBe(1);
-            expect(comment.getUser()).toEqual(mockUser);
+            expect(comment.getUser()).toEqual(mockUserInfo);
             expect(comment.getBody()).toBe('This is a test comment');
             expect(comment.getReview()).toBe(1);
             expect(comment.getCreatedAt()).toBeInstanceOf(Date);
+        });
+
+        test('should throw error if body is empty', () => {
+            expect(() => {
+                new Comment({
+                    ...validCommentData,
+                    body: ''
+                });
+            }).toThrow('comment cannot be empty');
+        });
+
+        test('should throw error if reviewId is missing', () => {
+            expect(() => {
+                new Comment({
+                    ...validCommentData,
+                    reviewId: 0
+                });
+            }).toThrow('comment must belong to a review');
         });
     });
 
@@ -45,7 +59,7 @@ describe('Comment Class', () => {
         });
 
         test('should get user', () => {
-            expect(comment.getUser()).toEqual(mockUser);
+            expect(comment.getUser()).toEqual(mockUserInfo);
         });
 
         test('should get body', () => {
@@ -83,7 +97,11 @@ describe('Comment Class', () => {
             expect(commentFromPrisma.getId()).toBe(prismaData.id);
             expect(commentFromPrisma.getBody()).toBe(prismaData.body);
             expect(commentFromPrisma.getReview()).toBe(prismaData.reviewId);
-            expect(commentFromPrisma.getUser()).toBeInstanceOf(User);
+            expect(commentFromPrisma.getUser()).toEqual({
+                id: prismaData.author.id,
+                email: prismaData.author.email,
+                username: prismaData.author.username
+            });
             expect(commentFromPrisma.getCreatedAt()).toBeInstanceOf(Date);
         });
     });

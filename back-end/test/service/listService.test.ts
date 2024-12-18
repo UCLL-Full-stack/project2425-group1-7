@@ -3,6 +3,7 @@ import listService from '../../service/listService';
 import listDb from '../../repository/list.db';
 import { ListInput } from '../../types';
 import { User } from '../../model/user';
+import { UserInfo } from '../../types';
 
 const mockUser = new User({
     id: 1,
@@ -13,6 +14,12 @@ const mockUser = new User({
     lists: [],
     reviews: []
 });
+
+const mockUserInfo: UserInfo = {
+    id: 1,
+    email: 'test@test.com',
+    username: 'testUser'
+}
 
 const mockListInput: ListInput = {
     title: 'My Favorite Albums',
@@ -26,7 +33,7 @@ const mockList = new List({
     title: 'My Favorite Albums',
     description: 'A list of my favorite albums',
     albumIds: ['1', '2'],
-    author: mockUser,
+    author: mockUserInfo,
     createdAt: new Date()
 });
 

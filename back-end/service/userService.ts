@@ -7,9 +7,8 @@ const registerUser = async (newUser: UserInput) => {
     try{
         await userDB.findByEmail(newUser.email);
         throw new Error(`user with Email ${newUser.email} already exists`);
-    }catch (e) {
-            throw e;
-    }
+    }catch (e){}
+
     if(newUser.email == "" || newUser.username == "" || newUser.password == ""){
         throw new Error("user fields can't be null");
     }

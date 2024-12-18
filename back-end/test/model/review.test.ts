@@ -1,6 +1,7 @@
 import { Review } from '../../model/review';
 import { User } from '../../model/user';
 import { Comment } from '../../model/comment';
+import { UserInfo } from '../../types';
 
 describe('Review Class', () => {
 
@@ -14,9 +15,15 @@ describe('Review Class', () => {
         reviews: []
     });
 
+    const mockUserInfo: UserInfo = {
+        id: 1,
+        email: 'test@example.com',
+        username: 'testuser'
+    };
+
     const mockComment = new Comment({
         id: 1,
-        author: mockUser,
+        author: mockUserInfo,
         body: 'Test comment',
         reviewId: 1,
         createdAt: new Date()
@@ -24,7 +31,7 @@ describe('Review Class', () => {
 
     const validReviewData = {
         id: 1,
-        author: mockUser,
+        author: mockUserInfo,
         title: 'Great Album',
         body: 'This album is amazing!',
         starRating: 5,
@@ -45,7 +52,7 @@ describe('Review Class', () => {
     describe('Constructor and Validation', () => {
         test('should create review instance with valid data', () => {
             expect(review.getId()).toBe(1);
-            expect(review.getUser()).toEqual(mockUser);
+            expect(review.getUser()).toEqual(mockUserInfo);
             expect(review.getTitle()).toBe('Great Album');
             expect(review.getDescription()).toBe('This album is amazing!');
             expect(review.getStarRating()).toBe(5);
@@ -106,8 +113,8 @@ describe('Review Class', () => {
             expect(review.getId()).toBe(1);
         });
 
-        test('should get user', () => {
-            expect(review.getUser()).toEqual(mockUser);
+        test('should get author', () => {
+            expect(review.getUser()).toEqual(mockUserInfo);
         });
 
         test('should get title', () => {
@@ -235,8 +242,11 @@ describe('Review Class', () => {
             expect(reviewFromPrisma.getDescription()).toBe(prismaData.body);
             expect(reviewFromPrisma.getStarRating()).toBe(prismaData.starRating);
             expect(reviewFromPrisma.getAlbum()).toBe(prismaData.albumID);
-            expect(reviewFromPrisma.getUser()).toBeInstanceOf(User);
-            expect(reviewFromPrisma.getComments()[0]).toBeInstanceOf(Comment);
+            expect(reviewFromPrisma.getUser()).toEqual({
+                id: prismaData.author.id,
+                email: prismaData.author.email,
+                username: prismaData.author.username
+            });
             expect(reviewFromPrisma.getLikes()).toEqual([2]);
         });
 

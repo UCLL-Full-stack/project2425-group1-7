@@ -3,22 +3,28 @@ import reviewService from '../../service/reviewService';
 import reviewDb from '../../repository/review.db';
 import { ReviewInput } from '../../types';
 import { User } from '../../model/user';
+import { UserInfo } from '../../types';
 
-// Create mock user
 const mockUser = new User({
     id: 1,
     createdAt: new Date(),
-    email: 'test@example.com',
-    username: 'testuser',
+    email: 'test@test.com',
+    username: 'testUser',
     password: 'password12345',
     lists: [],
     reviews: []
 });
 
+const mockUserInfo: UserInfo = {
+    id: 1,
+    email: 'test@test.com',
+    username: 'testUser'
+}
+
 // Create mock review
 const mockReview = new Review({
     id: 1,
-    author: mockUser,
+    author: mockUserInfo,
     title: 'Great Album',
     body: 'This album is amazing!',
     starRating: 5,
