@@ -1,11 +1,12 @@
 type Props={
     id?: number,
     handler: ()=>void,
-    onClose: (id?: number)=>void
-    message: string
+    onClose: (id?: number)=>void,
+    message: string,
+    isDeleting: boolean
 };
 
-const ConfirmModal = ({id, handler, onClose, message}: Props)=>{
+const ConfirmModal = ({id, handler, onClose, message, isDeleting}: Props)=>{
 
     return (
         <div
@@ -16,13 +17,13 @@ const ConfirmModal = ({id, handler, onClose, message}: Props)=>{
                 <div className="flex justify-center space-x-3">
                     <button
                         onClick={()=>onClose(id)}
-                        className="px-4 py-2 rounded-lg main-thin text-sm bg-text1 text-text2 hover:bg-text2 hover:text-text1 transition-colors duration-100"
+                        className="px-4 py-2 rounded-lg main-thin text-sm bg-text1 text-text2  hover:scale-105  transition-colors duration-100"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handler}
-                        className="px-4 py-2 rounded-lg main-thin text-sm bg-red-500 text-text2 hover:bg-text2 hover:text-red-500 transition-colors duratin-100"
+                        className={`px-4 py-2 rounded-lg main-thin text-sm ${isDeleting?'bg-red-500 text-text2':'bg-text2 text-text1'} hover:scale-105 duration-100`}
                     >
                         Confirm
                     </button>

@@ -1,4 +1,5 @@
 import { User } from "../model/user"
+import { Role } from "../types";
 import database from "../util/database";
 
 const registerUser = async (user: User): Promise<User> => {
@@ -59,12 +60,28 @@ const findByEmail = async (email: string): Promise<User> => {
     }
 }
 
+const promoteById = async (id: number, role: Role): Promise<User> =>{
+    try{
+        const userPrisma = await database.user.update({
+            where: {id},
+            data:{
+                role: role
+            }
+        })
+        if(!userPrisma) throw new Error('user does not exist');
+        return User.from(userPrisma);
+    }catch(e){
+        throw new Error("DB Error");
+    }
+}
+
 const blockById = async (id: number, isBlocked: boolean): Promise<User> =>{
     try{
         const userPrisma = await database.user.update({
             where: {id},
             data:{
-                isBlocked: !isBlocked
+                isBlocked: !isBlocked,
+                role: 'user'
             }
         })
         if(!userPrisma) throw new Error('user does not exist');
@@ -78,5 +95,6 @@ export default {
     registerUser,
     findByEmail,
     findById,
+    promoteById,
     blockById
 }

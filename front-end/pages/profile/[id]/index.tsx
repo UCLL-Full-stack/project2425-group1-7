@@ -17,6 +17,7 @@ const Profile: React.FC = () => {
 
     const router = useRouter();
     const [isBlockModal, setIsBlockModal] = useState<boolean>(false);
+    const [isPromoteModal, setIsPromoteModal] = useState<boolean>(false);
     const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
@@ -65,6 +66,7 @@ const Profile: React.FC = () => {
         if(isNaN(id)) return;
         fetchUser(id); 
 
+        setIsUserProfile(false);
         if(u.id === id){
             setIsUserProfile(true);
         }
@@ -73,7 +75,8 @@ const Profile: React.FC = () => {
         isDeleteListOpen, 
         isDeleteReviewOpen, 
         isBlockModal,
-        router
+        isPromoteModal,
+        router,
     ]);
 
     const handleCreateList = async (list: ListInput) => {
@@ -86,6 +89,15 @@ const Profile: React.FC = () => {
         const newList = await reviewService.createReview(review);
         console.log(newList);
         toggleReviewModal();
+    }
+
+    const handlePromoteUser = async () => {
+        if(!user)return;
+        const response = await userService.promoteUser(user.id);
+        if (!response.ok){
+            setError("Error Blocking User");
+        }
+        togglePromoteModal();
     }
 
     const handleBlockUser = async () => {
@@ -103,6 +115,7 @@ const Profile: React.FC = () => {
         if (!response.ok) {
             setError("Error Deleting List");
         }
+        setUser(await response.json());
     }
 
     const handleDeleteReview = async () => {
@@ -113,6 +126,7 @@ const Profile: React.FC = () => {
         }
     }
 
+    const togglePromoteModal = () => setIsPromoteModal(!isPromoteModal);
     const toggleBlockModal = () => setIsBlockModal(!isBlockModal);
     const toggleListModal = () => setIsListModalOpen(!isListModalOpen);
     const toggleReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
@@ -143,24 +157,27 @@ const Profile: React.FC = () => {
                                     {user.username}
                                 </span>
                                 <span className="text-center yadig-italic text-text2 text-xl">
-                                    digging since {new Date(user.createdAt).toLocaleDateString()}
+                                    digging since {user.createdAt && new Date(user.createdAt).toLocaleDateString()}
                                 </span>
                                 <div className="grid grid-cols-2 justify-center gap-4 max-w-[25vw]">
-                                {sessionUser.role === "admin" && !isUserProfile && (
+                                {sessionUser.role === "admin" && user.role !== 'admin' && !isUserProfile && (
                                     <>
                                         <button
                                             onClick={toggleBlockModal}
                                             type="button"
-                                            className="rounded-lg px-3 py-2 main-font text-sm text-white hover:bg-text2 hover:text-red-500 bg-red-500 transition-colors duration-100"
+                                            className={`${user.isBlocked && 'col-span-2'} rounded-lg px-3 py-2 main-font text-sm text-white hover:bg-text2 hover:text-red-500 bg-red-500 transition-colors duration-100`}
                                         >
-                                            Block Account
+                                            {user.isBlocked?'Unblock':'Block'} Account
                                         </button>
+                                    {!user.isBlocked &&
                                         <button
+                                            onClick={togglePromoteModal}
                                             type="button"
                                             className={`${user.role == 'user'? "text-text2 bg-text1 hover:bg-text2 hover:text-text1": "text-text1 bg-text2 hover:bg-red-500 hover:text-text2"} rounded-lg px-3 py-2 main-font text-sm transition-colors duration-100`}
                                         >
-                                        {user.role == 'user'? "Promote to Moderator": "Demote to user"}
+                                            {user.role == 'user'? "Promote to Moderator": "Demote to user"}
                                         </button>
+                                    }
                                     </>
                                 )}
                                 </div>
@@ -252,25 +269,36 @@ const Profile: React.FC = () => {
                             )}
                             {isDeleteListOpen && user && (
                                 <ConfirmModal 
+                                    isDeleting={true}
                                     id={selectedId} 
                                     handler={handleDeleteList} 
                                     onClose={toggleDeleteList}
-                                    message={`Deleting List !`}
+                                    message={`Delete List ?`}
                                     />
                             )}
                             {isDeleteReviewOpen && user && (
                                 <ConfirmModal 
+                                    isDeleting={true}
                                     id={selectedId} 
                                     handler={handleDeleteReview} 
                                     onClose={toggleDeleteReview}
-                                    message={`Deleting Review !`}
+                                    message={`Delete Review ?`}
                                     />
                             )}
                             {isBlockModal && user && (
                                 <ConfirmModal 
+                                    isDeleting={true}
                                     handler={handleBlockUser} 
                                     onClose={toggleBlockModal}
-                                    message={`Block ${user.username}`}
+                                    message={`${user.isBlocked?"Unblock":"Block"} ${user.username}?`}
+                                    />
+                            )}
+                            {isPromoteModal && user && (
+                                <ConfirmModal 
+                                    isDeleting={false}
+                                    handler={handlePromoteUser} 
+                                    onClose={togglePromoteModal}
+                                    message={`${user.role === 'user'?'Promote':'Demote'} ${user.username}?`}
                                     />
                             )}
                         </>

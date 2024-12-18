@@ -29,7 +29,7 @@ const CommentInput: React.FC<Props> = ({ onSubmit }) => {
             className="bg-bg4 text-text2 px-4 py-2 rounded-md hover:bg-text2 hover:text-bg1 transition duration-200 main-font uppercase text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={comment.trim() === ''}
         >
-          Send
+          Comment
         </button>
       </form>
     </div>

@@ -35,6 +35,20 @@ const findById = async(id: number): Promise<Response>=>{
     });        
 }
 
+const promoteUser = async(id: number): Promise<Response> =>{
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/promote/${id}`,{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+        },
+    });        
+}
+
 const blockAccount = async(id: number): Promise<Response> =>{
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
@@ -65,6 +79,7 @@ export default {
     registerUser,
     logIn,
     findById,
+    promoteUser,
     blockAccount,
     isJwtExpired
 }

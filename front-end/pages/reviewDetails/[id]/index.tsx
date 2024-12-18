@@ -30,6 +30,7 @@ const ListDetails = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     const [selectedComment, setSelectedComment] = useState<number>(-1);
+    const [displayComments, setDisplayComments] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
     const { data: review} = useSWR<Review>(
@@ -135,6 +136,7 @@ const ListDetails = () => {
         setSelectedComment(-1);
     }
 
+    const toggleDisplayComments = ()=> setDisplayComments(!displayComments);
     const toggleDeleteComment = (id: number)=>{
         setSelectedComment(id);
         setDeleteModal(true);
@@ -172,7 +174,7 @@ const ListDetails = () => {
                                         <h2 className="text-xl main-thin text-text2">By</h2>
                                         <Link
                                             href={`/profile/${review.author.id}`}
-                                            className="text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100">
+                                            className={`${review.author.id === user.id && 'text-green-500'} text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100`}>
                                             {review.author.username ?? 'Unknown'}
                                         </Link>
                                     </div>
@@ -194,24 +196,31 @@ const ListDetails = () => {
                             <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">
                                 <p>{comments.length}</p>
                                 <IconComment 
+                                    onClick={toggleDisplayComments}
                                     className="hover:scale-110 duration-100 text-text2 hover:text-bg1"
                                     width={25} height={25}/>
                             </span>
                         </div>
-                        <CommentInput onSubmit={handleComment}/>
-                        <div className="grid">
-                        {comments.map(comment=>(
-                            <CommentCard 
-                                key={comment.id} 
-                                comment={comment}
-                                onDelete={(
-                                    user.role === 'admin' || 
-                                    user.role === 'moderator'||
-                                    user.id === comment.author.id)
-                                    ?toggleDeleteComment:undefined} 
-                                />
-                        ))}
-                        </div>
+                        {displayComments &&
+                            <>
+                                <CommentInput onSubmit={handleComment}/>
+                                <div className="grid">
+                                {comments.map(comment=>(
+                                    <CommentCard 
+                                    key={comment.id} 
+                                    reviewAuthorId={review.author.id}
+                                    userId={user.id}
+                                    comment={comment}
+                                    onDelete={(
+                                        user.role === 'admin' || 
+                                            user.role === 'moderator'||
+                                            user.id === comment.author.id)
+                                                ?toggleDeleteComment:undefined} 
+                                                />
+                                ))}
+                                </div>
+                            </>
+                        }
                         {deleteModal &&
                             <ConfirmModal 
                                 id={selectedComment} 
