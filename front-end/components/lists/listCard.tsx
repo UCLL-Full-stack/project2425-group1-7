@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import IconDelete from "../ui/delete";
 import IconEdit from "../ui/edit";
 import IconLike from "../ui/like";
+import React from "react";
 
 type Props = {
     list: List;

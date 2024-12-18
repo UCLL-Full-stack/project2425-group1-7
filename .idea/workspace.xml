@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2mn3RTxx9nXiaHMuqbNgbGqkbMB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Jest.Review Class.Constructor and Validation.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Review Class.Constructor and Validation.should create review instance with valid data.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Review Class.static from method.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Review Class.static from method.should create Review from Prisma data.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Review Service.likeReview.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.User Service.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.User Service.registerUser.should throw error if email is empty.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.User Service.registerUser.should throw error if user with email already exists.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.albumCard.test.tsx.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.comment.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.commentCard.test.tsx.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.commentService.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.list.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.listService.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.review.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.reviewService.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.user.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.userService.test.ts.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7/front-end/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="Review Class.Constructor and Validation" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/back-end" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-names>
+        <test-name value="Review Class" />
+        <test-name value="Constructor and Validation" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Review Class.Constructor and Validation.should create review instance with valid data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/back-end" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-names>
+        <test-name value="Review Class" />
+        <test-name value="Constructor and Validation" />
+        <test-name value="should create review instance with valid data" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Review Class.static from method" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/back-end" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-names>
+        <test-name value="Review Class" />
+        <test-name value="static from method" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Review Class.static from method.should create Review from Prisma data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/back-end" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-names>
+        <test-name value="Review Class" />
+        <test-name value="static from method" />
+        <test-name value="should create Review from Prisma data" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="User Service.registerUser.should throw error if user with email already exists" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/back-end" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
+      <test-names>
+        <test-name value="User Service" />
+        <test-name value="registerUser" />
+        <test-name value="should throw error if user with email already exists" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="albumCard.test.tsx" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <config-file value="$PROJECT_DIR$/front-end/jest.config.js" />
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/front-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/front-end" />
+      <envs />
+      <scope-kind value="TEST_FILE" />
+      <test-file value="$PROJECT_DIR$/front-end/components/album/albumCard.test.tsx" />
+      <method v="2" />
+    </configuration>
+    <configuration name="commentCard.test.tsx" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <config-file value="$PROJECT_DIR$/front-end/jest.config.js" />
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/front-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST_FILE" />
+      <test-file value="$PROJECT_DIR$/front-end/components/comments/commentCard.test.tsx" />
+      <method v="2" />
+    </configuration>
+    <configuration name="comment.test.ts" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <config-file value="$PROJECT_DIR$/back-end/jest.config.js" />
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST_FILE" />
+      <test-file value="$PROJECT_DIR$/back-end/test/model/comment.test.ts" />
+      <method v="2" />
+    </configuration>
+    <configuration name="userService.test.ts" type="JavaScriptTestRunnerJest" nameIsGenerated="true">
+      <config-file value="$PROJECT_DIR$/back-end/jest.config.js" />
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST_FILE" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Jest.Review Class.static from method.should create Review from Prisma data" />
+        <item itemvalue="Jest.Review Class.static from method" />
+        <item itemvalue="Jest.Review Class.Constructor and Validation" />
+        <item itemvalue="Jest.Review Class.Constructor and Validation.should create review instance with valid data" />
+        <item itemvalue="Jest.User Service.registerUser.should throw error if user with email already exists" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="" />
+      <created>1727698504108</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1727698504108</updated>
+      <workItem from="1727698505160" duration="948000" />
+      <workItem from="1728299836154" duration="720000" />
+      <workItem from="1734437242516" duration="1387000" />
+      <workItem from="1734441285103" duration="14002000" />
+      <workItem from="1734468062567" duration="12727000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
