@@ -45,8 +45,9 @@ export type CommentInput = {
 export type User = {
     id: number,
     username: string,
-    createdAt: Date,
+    createdAt?: Date,
     role: Role,
+    isBlocked: boolean,
     lists?: List[],
     reviews?: Review[],
 }

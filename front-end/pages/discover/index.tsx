@@ -25,20 +25,30 @@ const Discover = ({albums}: Props) => {
         setUser(await response.json());
     }
 
-    useEffect(() => {
-        const userString = sessionStorage.getItem("LoggedInUser");
-        if(!userString || 
-           userService.isJwtExpired(JSON.parse(userString).token)
-          ){
-            router.push("/login");
-            return;
-        }
+    if (user && user.isBlocked){
+        router.push('/blocked');
+    }
 
-        const id = JSON.parse(userString).id;
-        fetchUser(id); 
+    useEffect(() => {
+        const getUser = () => {
+            const userString = sessionStorage.getItem("LoggedInUser");
+            if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
+                const u = JSON.parse(userString);
+                setUser({
+                    id: u.id,
+                    username: u.username,
+                    isBlocked: u.isBlocked,
+                    role: u.role
+                });
+                return;
+            }
+
+            router.push("/login");
+        };
+        getUser();
     }, []);
     
-    return (
+    return (user &&
         <>
             <Head>
                 <title>Yadig</title>

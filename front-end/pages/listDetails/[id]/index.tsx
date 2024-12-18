@@ -31,21 +31,26 @@ const ListDetails = () => {
     useEffect(()=>{
         const getUser = () => {
             const userString = sessionStorage.getItem("LoggedInUser");
-            const u = JSON.parse(userString ?? "");
-            if (!userString || userService.isJwtExpired(u.token)) {
-                router.push("/login");
+            if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
+                const u = JSON.parse(userString);
+                setUser({
+                    id: u.id,
+                    username: u.username,
+                    isBlocked: u.isBlocked,
+                    role: u.role
+                });
                 return;
             }
 
-            setUser({
-                id: Number(u.id),
-                email: u.email,
-                username: u.username
-            });
+            router.push("/login");
         };
-
         getUser();
+
     },[])
+
+    if (user && user.isBlocked){
+        router.push('/blocked');
+    }
 
     useEffect(()=>{
         if(!user || !data){

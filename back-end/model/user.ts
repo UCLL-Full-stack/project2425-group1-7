@@ -16,6 +16,7 @@ export class User{
     private username: string;
     private password: string;
     private role: Role;
+    private isBlocked: boolean;
     private lists?: List[];
     private reviews?: Review[];
 
@@ -26,6 +27,7 @@ export class User{
         username: string, 
         password: string,
         role: Role,
+        isBlocked?: boolean,
         lists?: List[],
         reviews?: Review[]
     }){
@@ -35,6 +37,7 @@ export class User{
         this.username = user.username;
         this.password = user.password;
         this.role = user.role;
+        this.isBlocked = user.isBlocked??false;
         this.createdAt = user.createdAt;
         this.lists = user.lists??[];
         this.reviews = user.reviews??[];
@@ -47,6 +50,7 @@ export class User{
         username,
         password,
         role,
+        isBlocked,
         lists,
         reviews
     }: UserPrisma & {
@@ -67,6 +71,7 @@ export class User{
             username: username,
             password: password,
             role: role as Role,
+            isBlocked: isBlocked,
             lists: lists?.map((list)=>List.from(list))??[],
             reviews: reviews?.map((review)=>Review.from(review))??[]
         });
@@ -104,6 +109,10 @@ export class User{
 
     getRole(): Role{
         return this.role;
+    }
+
+    getIsBlocked(): boolean{
+        return this.isBlocked;
     }
 
     setEmail(email: string){

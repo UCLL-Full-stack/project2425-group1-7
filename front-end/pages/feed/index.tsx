@@ -3,6 +3,7 @@ import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
+import userService from "@/services/userService";
 import { List, Review, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -13,18 +14,33 @@ type Props = {
     reviews: Review[]
 }
 
-const Home = ({ lists, reviews }: Props) => {
+const Feed = ({ lists, reviews }: Props) => {
     const router = useRouter();
     const [user, setUser] = useState<User>();
 
     useEffect(() => {
-        const userString = sessionStorage.getItem("LoggedInUser");
-        if (userString) {
-            setUser(JSON.parse(userString))
-            return;
-        }
-        router.push("/login");
+        const getUser = () => {
+            const userString = sessionStorage.getItem("LoggedInUser");
+            if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
+                const u = JSON.parse(userString);
+                setUser({
+                    id: u.id,
+                    username: u.username,
+                    isBlocked: u.isBlocked,
+                    role: u.role
+                });
+                return;
+            }
+
+            router.push("/login");
+        };
+
+        getUser();
     }, []);
+
+    if (user && user.isBlocked){
+        router.push('/blocked');
+    }
 
     return (
         <>
@@ -75,12 +91,16 @@ export const getServerSideProps = async () => {
         ).reverse();
         lists.sort((a, b)=>a.likes.length - b.likes.length).reverse();
 
-        return {props: {lists, reviews}};
+        return {props: {
+            lists: lists.filter(l=> !l.author.isBlocked), 
+            reviews: reviews.filter(r=> !r.author.isBlocked)
+        }};
+        
     }catch(e){
         console.log(e);
         return {props: {lists: [], reviews: []}};
     }
 } 
 
-export default Home;
+export default Feed;
 

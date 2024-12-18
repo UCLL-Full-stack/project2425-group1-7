@@ -50,6 +50,7 @@ export class List{
                 id: author.id,
                 username: author.username,
                 role: author.role as Role,
+                isBlocked: author.isBlocked,
                 createdAt: author.createdAt
             },
             title: title,

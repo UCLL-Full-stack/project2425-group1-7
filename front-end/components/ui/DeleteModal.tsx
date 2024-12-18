@@ -1,7 +1,7 @@
 type Props={
-    id: number,
+    id?: number,
     handler: ()=>void,
-    onClose: (id: number)=>void
+    onClose: (id?: number)=>void
     message: string
 };
 
