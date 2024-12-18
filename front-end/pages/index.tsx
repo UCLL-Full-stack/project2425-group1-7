@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import HoverTitle from "@/components/ui/hoverTitle";
+import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
@@ -59,7 +60,7 @@ const Home = ({ lists, reviews, albums }: Props) => {
                     </span>
                 </div>
                 <main className="flex-1 grid sm:grid-cols-1 md:grid-cols-2 gap-4 bg-bg1 xs:px-2 p-10 overflow-y-auto">
-                    <section className="p-4 xs:p-2 grid items-center text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
+                    <section className="px-4 xs:p-2 grid items-center text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
 
                         {/* Popular Lists Section */}
                         <div className="pb-5 xs:pb-1 grid gap-6">
@@ -118,28 +119,33 @@ const Home = ({ lists, reviews, albums }: Props) => {
                     </section>
 
                     {/* Most Reviewed Albums Section */}
-                    <section className="text-center">
-                        <h2 className="text-2xl main-font text-text2 mb-4">Most Reviewed Albums</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <section className="px-4 xs:p-2 flex flex-col text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
+                        <Link href="/discover" className="mb-10">
+                            <HoverTitle  text1="Most Reviewed Albums" text2="View More"/>
+                        </Link>
+                        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
                             {albums &&
                                 albums.map((album) => (
                                     <AlbumCard key={album.id} album={album} />
                                 ))
                             }
                         </div>
-                        <div>
-                            <Link
-                                className="mt-4 px-4 py-2 bg-text1 text-white rounded-lg hover:bg-text2 hover:text-text1 "
-                                href="/discover"
-                            >
-                                View More
-                            </Link>
-                        </div>
                     </section>
                 </main>
             </div>
         </>
     );
+};
+
+const getAlbumsByFrequency = (albums: string[]): string[] => {
+    const frequencyMap: Record<string, number> = {};
+    albums.forEach(item=>{
+        frequencyMap[item] = (frequencyMap[item] || 0) + 1;
+    });
+
+    const sorted = Object.keys(frequencyMap)
+                    .sort((a,b) => frequencyMap[b] - frequencyMap[a])
+    return sorted;
 };
 
 export const getServerSideProps = async () => {
@@ -156,13 +162,25 @@ export const getServerSideProps = async () => {
         }
         const lists: List[] = await response.json();
 
+        const albumIds: string[] = [];
+        reviews.map(r=>albumIds.push(r.albumId));
+        const sortedAlbumIds = getAlbumsByFrequency(albumIds);
+
+        const albumDetails = sortedAlbumIds.map(id => id.split('_'));
+        const albums = await Promise.all(
+            albumDetails.map(([title, artist]) => 
+                albumService.fetchAlbum(title, artist)
+            )
+        );
+
         return {props: {
             lists: lists.filter(l=> !l.author.isBlocked), 
-            reviews: reviews.filter(r=> !r.author.isBlocked)
+            reviews: reviews.filter(r=> !r.author.isBlocked),
+            albums: albums.slice(0,8)
         }};
     }catch(e){
         console.log(e);
-        return {props: {lists: [], reviews: []}};
+        return {props: {lists: [], reviews: [], albums: []}};
     }
 } 
 
