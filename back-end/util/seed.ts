@@ -32,7 +32,7 @@ const main = async () =>{
             username: "dezz",
             email: "dezz@yadig.com",
             password: await hash("dezzDaMod",12),
-            role: "admin"
+            role: "moderator"
         }         
     })
 }

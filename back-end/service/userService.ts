@@ -71,6 +71,29 @@ const getById = async (id: number): Promise<UserInfo> => {
     }
 }
 
+const promoteUser = async (id: number, role: Role): Promise<UserInfo> => {
+    try{
+        const u = await userDB.findById(id);
+        if(
+            role !== 'admin'
+        ) throw new Error("You are not authorized to access this resource");
+
+        const newRole = u.getRole() == 'user'? 'moderator':'user';
+        const user = await userDB.promoteById(id, newRole);
+        return {
+            id: user.getId(),
+            username: user.getUsername(),
+            role: user.getRole(),
+            isBlocked: user.getIsBlocked(),
+            createdAt: user.getCreatedAt(),
+            reviews: user.getReviews(),
+            lists: user.getLists(),
+        };
+    }catch(e){
+        throw e;
+    }
+}
+
 const blockUser = async (id: number, role: Role): Promise<UserInfo> => {
     try{
         const u = await userDB.findById(id);
@@ -97,5 +120,6 @@ export default {
     registerUser,
     loginUser,
     getById,
+    promoteUser,
     blockUser
 }

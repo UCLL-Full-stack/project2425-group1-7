@@ -34,6 +34,17 @@ userRouter.post('/login', async (req: Request, res: Response, next: NextFunction
     }
 });
 
+userRouter.put('/promote/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const request = req as Request & {auth: {role: Role}}
+        const {role}= request.auth;
+        const id = Number(req.params['id']);
+        const user = await userService.promoteUser(id, role);
+        res.status(200).json(user);
+    }catch(e){
+        next(e);
+    }
+});
 
 userRouter.put('/block/:id', async (req: Request, res: Response, next: NextFunction) => {
     try{
