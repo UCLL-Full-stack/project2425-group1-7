@@ -1,4 +1,4 @@
-import { 
+import {
     Review as ReviewPrisma,
     Comment as CommentPrisma,
     User as UserPrisma
@@ -12,7 +12,7 @@ export class Review{
     private readonly author?: UserInfo;
     private title: string;
     private body: string;
-    private starRating: number; 
+    private starRating: number;
     private albumId: string;
     private comments?: Comment[];
     private likes?: number[];
@@ -20,7 +20,7 @@ export class Review{
     constructor(review: {
         id?: number,
         author?: UserInfo,
-        title: string, 
+        title: string,
         body: string,
         starRating: number,
         albumId: string,
@@ -41,19 +41,19 @@ export class Review{
     }
 
     static from({
-        id,
-        author,
-        createdAt,
-        title,
-        body,
-        starRating,
-        albumID,
-        comments,
-        likes
-    }: ReviewPrisma & {
-            comments?: (CommentPrisma & {author: UserPrisma})[];
-            likes?: UserPrisma[];
-            author: UserPrisma;
+                    id,
+                    author,
+                    createdAt,
+                    title,
+                    body,
+                    starRating,
+                    albumID,
+                    comments,
+                    likes
+                }: ReviewPrisma & {
+        comments?: (CommentPrisma & {author: UserPrisma})[];
+        likes?: UserPrisma[];
+        author: UserPrisma;
     }){
         return new Review({
             id: id,
