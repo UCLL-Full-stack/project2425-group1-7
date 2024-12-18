@@ -42,7 +42,7 @@ export type CommentInput = {
     reviewId: number,
 }
 
-export type UserInfo = {
+export type User = {
     id: number,
     username: string,
     createdAt: Date,
@@ -53,7 +53,7 @@ export type UserInfo = {
 
 export type List = {
     id: number,
-    author: UserInfo,
+    author: User,
     createdAt: number,
     title: string,
     description: string,
@@ -63,7 +63,7 @@ export type List = {
 
 export type Review = {
     id: number,
-    author: UserInfo,
+    author: User,
     createdAt: number,
     title: string,
     body: string,
@@ -75,7 +75,7 @@ export type Review = {
 
 export type Comment = {
     id: number,
-    author: UserInfo, 
+    author: User, 
     createdAt: number,
     body: string,
     reviewId: number

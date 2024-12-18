@@ -1,4 +1,3 @@
-import listService from "@/services/listService";
 import { List } from "@/types/index";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -43,7 +42,7 @@ const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
 
     return (
         <div onClick={handleRedirect} 
-            className="bg-text1 min-w-[20vw] max-w-[25vw] p-4 sm:p-5 rounded-lg shadow-lg shadow-text1 transform transition-all duration-100 hover:scale-105">
+            className="bg-text1 max-h-[20vh] min-w-[20vw] max-w-[25vw] p-4 sm:p-5 rounded-lg shadow-lg shadow-text1 transform transition-all duration-100 hover:scale-105">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl sm:text-2xl main-font mb-2 text-text2 truncate">{title}</h2>
                 {onDelete &&

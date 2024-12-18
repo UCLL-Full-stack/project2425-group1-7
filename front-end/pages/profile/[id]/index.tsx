@@ -8,7 +8,7 @@ import IconAdd from "@/components/ui/add";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { ListInput, ReviewInput, UserInfo } from "@/types/index";
+import { ListInput, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -21,8 +21,8 @@ const Profile: React.FC = () => {
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
     const [isDeleteReviewOpen, setIsDeleteReviewOpen] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<number>(0);
-    const [user, setUser] = useState<UserInfo>();
-    const [sessionUser, setSessionUser] = useState<UserInfo>();
+    const [user, setUser] = useState<User>();
+    const [sessionUser, setSessionUser] = useState<User>();
     const [isUserProfile, setIsUserProfile] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 

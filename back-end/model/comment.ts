@@ -73,7 +73,7 @@ export class Comment{
         return this.createdAt;
     }
 
-    getUser(): UserInfo | undefined{
+    getAuthor(): UserInfo | undefined{
         return this.author;
     }
 }

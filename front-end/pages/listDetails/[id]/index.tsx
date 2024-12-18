@@ -5,7 +5,7 @@ import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import userService from "@/services/userService";
-import { Album, List, UserInfo } from "@/types/index";
+import { Album, List, User } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,7 +19,7 @@ const ListDetails = () => {
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
-    const [user, setUser] = useState<UserInfo>();
+    const [user, setUser] = useState<User>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 

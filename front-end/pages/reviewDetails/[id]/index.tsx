@@ -3,13 +3,14 @@ import CommentCard from "@/components/comments/commentCard";
 import CommentInput from "@/components/comments/commentInput";
 import Header from "@/components/header";
 import IconComment from "@/components/ui/comment";
+import ConfirmModal from "@/components/ui/DeleteModal";
 import IconLike from "@/components/ui/like";
 import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import commentService from "@/services/commentService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { Album, Review, UserInfo, Comment } from "@/types/index";
+import { Album, Review, User, Comment } from "@/types/index";
 import { Rating } from "@mui/material";
 import Head from "next/head";
 import Link from "next/link";
@@ -21,12 +22,14 @@ const ListDetails = () => {
     const router = useRouter();
     const { id } = router.query;
 
-    const [user, setUser] = useState<UserInfo>();
+    const [user, setUser] = useState<User>();
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [comments, setComments] = useState<Comment[]>([]);
     const [clicked, setClicked] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
+    const [selectedComment, setSelectedComment] = useState<number>(-1);
     const [error, setError] = useState<string>("");
 
     const { data: review} = useSWR<Review>(
@@ -48,9 +51,10 @@ const ListDetails = () => {
                 return;
             }
             setUser({
-                id: Number(u.id),
-                email: u.email,
-                username: u.username
+                id: u.id,
+                username: u.username,
+                createdAt: u.createdAt,
+                role: u.role
             });
         };
 
@@ -112,8 +116,27 @@ const ListDetails = () => {
         if(!response.ok){
             setError(await response.json());
         }
-        const updatedReview = await fetchReview(review.id);
-        setComments(updatedReview.comments);
+        setComments([
+            ...comments,
+            await response.json()
+        ]);
+    }
+
+    const handleDeleteComment = async () => {
+        setDeleteModal(false);
+        if(!review)return;
+        const response = await commentService.deleteComment(selectedComment);
+        if(!response.ok){
+            setError("Error deleting comment");
+        }
+
+        setComments(comments.filter(c=> c.id !== selectedComment));
+        setSelectedComment(-1);
+    }
+
+    const toggleDeleteComment = (id: number)=>{
+        setSelectedComment(id);
+        setDeleteModal(true);
     }
 
     return (
@@ -134,7 +157,7 @@ const ListDetails = () => {
                     <div className="flex justify-center items-center">
                         <IconDisc height={100} width={100}/>
                     </div>
-                ):(album && review &&
+                ):(!error && user && album && review &&
                     <div className="max-w-4xl mx-auto bg-text1 py-4 px-6 rounded-lg shadow-md">
                         <div className="grid grid-cols-4">
                             <div className="flex justify-center flex-wrap">
@@ -177,9 +200,25 @@ const ListDetails = () => {
                         <CommentInput onSubmit={handleComment}/>
                         <div className="grid">
                         {comments.map(comment=>(
-                            <CommentCard key={comment.id} comment={comment}/>
+                            <CommentCard 
+                                key={comment.id} 
+                                comment={comment}
+                                onDelete={(
+                                    user.role === 'admin' || 
+                                    user.role === 'moderator'||
+                                    user.id === comment.author.id)
+                                    ?toggleDeleteComment:undefined} 
+                                />
                         ))}
                         </div>
+                        {deleteModal &&
+                            <ConfirmModal 
+                                id={selectedComment} 
+                                handler={handleDeleteComment} 
+                                onClose={toggleDeleteComment}
+                                message={`Delete Comment?`}
+                            />
+                        }
                     </div>
                     )}
                 </main>

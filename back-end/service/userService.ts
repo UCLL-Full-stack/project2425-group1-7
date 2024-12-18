@@ -40,7 +40,7 @@ const loginUser = async ({email, password}: UserInput): Promise<AuthResponse> =>
             throw new Error("Invalid Credentials");
         }
 
-        const token = generateJWT(userExists.getEmail(), userExists.getUsername());
+        const token = generateJWT(userExists.getRole(), userExists.getUsername());
         return {
             token: token,
             id: userExists.getId(),
