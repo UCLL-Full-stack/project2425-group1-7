@@ -3,18 +3,32 @@
 
 YaDig is a social media application that allows users to connect through music taste
 
-#### to run add an env file: 
-1. in the back-end directory (.env):
+### How to run: 
+#### in the back-end directory:
+1. create a .env file:
 ```
 APP_PORT=3030
 DATABASE_URL={YOUR_POSGRES_URL}
 JWT_EXPIRES_HOURS=6
 JWT_SECRET=alsdjbqeiorbgq93g9o3yt2348t03utbv3-qtv1-034unt-29493t
 ```
-2. in the front-end directory (.env.local):
+2. run 
+```
+$ npm i
+$ npx prisma generate
+$ npx ts-node ./utils/seed.ts
+$ npm start
+```
+#### in the front-end directory:
+1. create a .env file:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3030
 NEXT_PUBLIC_LASTFM_API_KEY=78f1f6e5eaaf7d27216635ecedaaadc6
+```
+2. run 
+```
+$ npm i
+$ npm start
 ```
 
 ### Adam Benkhazzi / Sadra Dezdar

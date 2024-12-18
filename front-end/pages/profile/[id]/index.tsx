@@ -8,7 +8,7 @@ import IconAdd from "@/components/ui/add";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { ListInput, ReviewInput, User, UserInfo } from "@/types/index";
+import { ListInput, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
     const [isDeleteReviewOpen, setIsDeleteReviewOpen] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<number>(0);
     const [user, setUser] = useState<User>();
-    const [sessionUser, setSessionUser] = useState<UserInfo>();
+    const [sessionUser, setSessionUser] = useState<User>();
     const [isUserProfile, setIsUserProfile] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
@@ -50,7 +50,8 @@ const Profile: React.FC = () => {
         setSessionUser({
             id: u.id,
             username: u.username,
-            email: u.email,
+            createdAt: u.createdAt,
+            role: u.role
         });
 
 
@@ -127,7 +128,13 @@ const Profile: React.FC = () => {
                                 <span className="text-center yadig-italic text-text2 text-xl">
                                     digging since {new Date(user.createdAt).toLocaleDateString()}
                                 </span>
+                                    
                             </div>
+                            {(user.role === "admin" || user.role === "moderator") && (
+                                <span className="text-center bg-bg1 border-b border-bg3  main-thin text-green-500 text-xl">
+                                {user.role.toUpperCase()}
+                                </span>
+                            )}
                             <main className="flex-1 flex flex-col lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                                 <div className="w-full lg:w-1/2 lg:pr-10 mb-6 lg:mb-0">
                                     <div className="relative flex items-center justify-center">
@@ -147,10 +154,10 @@ const Profile: React.FC = () => {
                                     )}
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 justify-center pt-6 sm:pt-10 gap-4">
-                                    {user && user.reviews.length > 0 ? user.reviews.map((review) => (
+                                    {user.reviews && user.reviews.length > 0 ? user.reviews.map((review) => (
                                             <ReviewCard key={review.id} review={review} onDelete={isUserProfile?handleDeleteReview:undefined} userId={user.id}/>
                                     )) : (
-                                        <h2 className="pt-6 sm:pt-10 sm:col-span-2 text-center main-font text-white">No Reviews To Show</h2>
+                                            <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Reviews To Show</h2>
                                     )}
                                     </div>
                                 </div>
@@ -173,7 +180,7 @@ const Profile: React.FC = () => {
                                     )}
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 sm:pt-10 gap-4">
-                                        {user && user.lists.length > 0 ? user.lists.map((list) => (
+                                        {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
                                             <ListCard key={list.id} list={list}  onDelete={isUserProfile?handleDeleteList:undefined} userId={user.id}/>
                                         )) : (
                                             <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Lists To Show</h2>

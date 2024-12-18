@@ -30,7 +30,7 @@ const Login: React.FC = () => {
             "LoggedInUser", 
             JSON.stringify({
                 token: jwtResponse.token,
-                email: jwtResponse.email,
+                role: jwtResponse.role,
                 username: jwtResponse.username,
                 id: jwtResponse.id
             })

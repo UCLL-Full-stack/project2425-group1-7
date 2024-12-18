@@ -1,17 +1,31 @@
 import { Comment } from "../model/comment";
-import { CommentInput } from "../types";
 import database from "../util/database";
 
-const createComment = async (comment:CommentInput): Promise<Comment>=>{
+const getById = async (id:number): Promise<Comment> => {
+    try{
+        const commentPrisma = await database.comment.findUnique({
+            where: {id},
+            include: {
+                author: true
+            }
+        }); 
+        if (!commentPrisma)throw new Error("Comment doesn't exist");
+        return Comment.from(commentPrisma);
+    }catch(e){
+        throw new Error("DB ERROR")
+    }
+}
+
+const createComment = async (comment: Comment, authorId: number): Promise<Comment>=>{
     try{
         const commentPrisma = await database.comment.create({
             data:{
-                body: comment.body,
+                body: comment.getBody(),
                 author: {
-                    connect: {id: comment.authorId}
+                    connect: {id: authorId}
                 },
                 review: {
-                    connect: {id: comment.reviewId}
+                    connect: {id: comment.getReview()}
                 }
             },
             include:{
@@ -25,6 +39,18 @@ const createComment = async (comment:CommentInput): Promise<Comment>=>{
     }
 }
 
+const deleteById = async (id: number)=>{
+    try{
+        await database.comment.delete({
+            where: {id}
+        })
+    }catch(e){
+        throw new Error("DB ERROR")
+    }
+}
+
 export default {
-    createComment
+    getById,
+    createComment,
+    deleteById
 }

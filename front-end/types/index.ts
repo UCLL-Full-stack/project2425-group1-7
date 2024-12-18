@@ -1,3 +1,5 @@
+export type Role = 'user' | 'admin' | 'moderator'
+
 export type Album = {
     id: string,
     name: string,
@@ -42,18 +44,11 @@ export type CommentInput = {
 
 export type User = {
     id: number,
+    username: string,
     createdAt: Date,
-    email: string,
-    password: string,
-    username: string,
-    lists: List[],
-    reviews: Review[]
-}
-
-export type UserInfo = {
-    id: number,
-    username: string,
-    email: string,
+    role: Role,
+    lists?: List[],
+    reviews?: Review[],
 }
 
 export type List = {

@@ -2,7 +2,7 @@ import {
     Comment as CommentPrisma,
     User as UserPrisma,
 } from '@prisma/client'
-import { UserInfo } from '../types';
+import { Role, UserInfo } from '../types';
 
 export class Comment{
     private readonly id?: number;
@@ -41,8 +41,9 @@ export class Comment{
             body: body,
             author: {
                 id: author.id,
-                email: author.email, 
-                username: author.username
+                role: author.role as Role,
+                username: author.username,
+                createdAt: author.createdAt
             },
             reviewId: reviewId
         });
@@ -72,7 +73,7 @@ export class Comment{
         return this.createdAt;
     }
 
-    getUser(): UserInfo | undefined{
+    getAuthor(): UserInfo | undefined{
         return this.author;
     }
 }

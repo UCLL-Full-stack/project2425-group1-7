@@ -4,25 +4,28 @@ import {
     User as UserPrisma,
     Comment as CommentPrisma,
 } from '@prisma/client';
+import { Role } from '../types';
 import { List } from './list';
 import { Review } from './review';
 
 export class User{
 
-    private readonly id: number;
-    private readonly createdAt: number;
+    private readonly id?: number;
+    private readonly createdAt?: Date;
     private email: string;
     private username: string;
     private password: string;
+    private role: Role;
     private lists?: List[];
     private reviews?: Review[];
 
     constructor(user: {
-        id: number;
-        createdAt: Date;
+        id?: number;
+        createdAt?: Date;
         email: string, 
         username: string, 
         password: string,
+        role: Role,
         lists?: List[],
         reviews?: Review[]
     }){
@@ -31,7 +34,8 @@ export class User{
         this.email = user.email;   
         this.username = user.username;
         this.password = user.password;
-        this.createdAt = Date.now();
+        this.role = user.role;
+        this.createdAt = user.createdAt;
         this.lists = user.lists??[];
         this.reviews = user.reviews??[];
     }
@@ -42,6 +46,7 @@ export class User{
         email,
         username,
         password,
+        role,
         lists,
         reviews
     }: UserPrisma & {
@@ -61,12 +66,14 @@ export class User{
             email: email,
             username: username,
             password: password,
+            role: role as Role,
             lists: lists?.map((list)=>List.from(list))??[],
             reviews: reviews?.map((review)=>Review.from(review))??[]
         });
     }
 
     getId(): number {
+        if(!this.id) throw new Error("User Doesn't have ID");
         return this.id;
     }
 
@@ -90,8 +97,13 @@ export class User{
         return this.reviews??[];
     }
 
-    getCreatedAt(): number{
+    getCreatedAt(): Date{
+        if(!this.createdAt) throw new Error("User Doesn't have Creation Date");
         return this.createdAt;
+    }
+
+    getRole(): Role{
+        return this.role;
     }
 
     setEmail(email: string){

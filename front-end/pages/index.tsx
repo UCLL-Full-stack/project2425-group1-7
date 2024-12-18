@@ -5,7 +5,7 @@ import ReviewCard from "@/components/reviews/reviewCard";
 import HoverTitle from "@/components/ui/hoverTitle";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
-import { Album, List, Review, UserInfo } from "@/types/index";
+import { Album, List, Review, User } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -16,9 +16,8 @@ type Props = {
     albums: Album[]
 }
 
-
 const Home = ({ lists, reviews, albums }: Props) => {
-    const [user, setUser] = useState<UserInfo>();
+    const [user, setUser] = useState<User>();
 
     useEffect(() => {
         const userString = sessionStorage.getItem("LoggedInUser");
@@ -36,14 +35,14 @@ const Home = ({ lists, reviews, albums }: Props) => {
                 <Header current="home" user={user} />
                 <div className="bg-bg1 xs:p-4 lg:p-8 w-screen grid gap-3">
                     <span className="text-center main-font text-text2 sm:text-xl md:text-4xl">
-                        {user ? `welcome back ${user.username}` :( "welcome newcomer 👋")} 
+                        {user ? `welcome back ${user.username}` :( "welcome newcomer")} 
                     </span>
                     <span className="text-center yadig-italic text-text2 text-xl">
                         {user ? "what are you digging today?":("Log in and start Digging 🎧")}
                     </span>
                 </div>
                 <main className="flex-1 grid sm:grid-cols-1 md:grid-cols-2 gap-4 bg-bg1 xs:px-2 p-10 overflow-y-auto">
-                    <section className="p-4 xs:p-2 text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
+                    <section className="p-4 xs:p-2 grid items-center text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
 
                         {/* Popular Lists Section */}
                         <div className="pb-5 xs:pb-1 grid gap-6">
@@ -51,25 +50,25 @@ const Home = ({ lists, reviews, albums }: Props) => {
                                 <HoverTitle  text1="Popular Lists" text2="View More"/>
                            </Link>
 
-                            <div className="slider-container border border-bg1 xs:p-2">
+                            <div className="slider-container">
+                            {lists.length > 0 ?(
                                 <div className="slider">
-                                    {lists &&
-                                        lists.slice(0, Math.min(lists.length, 15)).map((list) => (
-                                            <ListCard key={list.id} list={list} userId={user?.id}/>
+                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                        <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists &&
-                                        lists.slice(0, Math.min(lists.length, 15)).map((list) => (
-                                            <ListCard key={list.id} list={list} userId={user?.id}/>
+                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                        <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists &&
-                                        lists.slice(0, Math.min(lists.length, 15)).map((list) => (
-                                            <ListCard key={list.id} list={list} userId={user?.id}/>
+                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                        <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists &&
-                                        lists.slice(0, Math.min(lists.length, 15)).map((list) => (
-                                            <ListCard key={list.id} list={list} userId={user?.id}/>
+                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                        <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
                                 </div>
+                            ):(
+                                <span>No Lists to Show</span>
+                            )}
                             </div>
                         </div>
 

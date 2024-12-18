@@ -1,23 +1,22 @@
 import { User } from "../model/user"
-import { UserInput } from "../types";
 import database from "../util/database";
 
-const registerUser = async (newUser: UserInput) => {
+const registerUser = async (user: User): Promise<User> => {
     try{
         const userPrisma = await database.user.create({
             data:{
-                username: newUser.username,
-                password: newUser.password,
-                email: newUser.email
+                username: user.getUsername(),
+                password: user.getPassword(),
+                email: user.getEmail(),
             }          
         });
         return User.from(userPrisma);
     } catch(e){
-        throw new Error("DB Error");
+        throw new Error("DB Error: "+ e);
     }
 }
 
-const findById = async (id: number) => {
+const findById = async (id: number): Promise<User> => {
     try{
         const userPrisma = await database.user.findFirst({
             where: {id},
@@ -51,7 +50,7 @@ const findById = async (id: number) => {
     }
 }
 
-const findByEmail = async (email: string) => {
+const findByEmail = async (email: string): Promise<User> => {
     try{
         const userPrisma = await database.user.findFirst({
             where: {email},
@@ -62,7 +61,7 @@ const findByEmail = async (email: string) => {
             throw new Error("User doesn't Exist");
 
     }catch(e){
-        throw new Error("DB Error");
+        throw new Error("DB Error: "+ e);
     }
 }
 

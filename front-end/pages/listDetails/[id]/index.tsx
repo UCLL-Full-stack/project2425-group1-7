@@ -5,7 +5,7 @@ import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import userService from "@/services/userService";
-import { Album, List, UserInfo } from "@/types/index";
+import { Album, List, User } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -19,18 +19,13 @@ const ListDetails = () => {
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
-    const [user, setUser] = useState<UserInfo>();
+    const [user, setUser] = useState<User>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
-    const { data: list, error: listError} = useSWR<List>(
-        id ? `list/${id}` : null, 
-        () => fetchList(id as string)
-    );
-
-    const { data : albums }= useSWR<Album[]>(
-        list ? `albums/${list.id}` : null, 
-        () => fetchAlbums(list)
+    const {data} = useSWR<{list: List, albums: Album[]}>(
+        id ? `listWithAlbums/${id}` : null,
+        () => fetchListWithAlbums(Number(id))
     );
 
     useEffect(()=>{
@@ -53,39 +48,39 @@ const ListDetails = () => {
     },[])
 
     useEffect(()=>{
-        if(!user || !albums){
+        if(!user || !data){
             setIsLoading(true);
             return
         }
         setIsLoading(false);
-    }, [user, albums])
+    }, [user, data])
 
     useEffect(()=>{
-        if(!list || !user) {
+        if(!data || !user) {
             return;
         }
-        const userLiked = list.likes.find(like=> like === user.id);
-        if(userLiked) setIsLiked(true);
-        setLikeCount(list.likes.length);
-    },[list]);
+        const userLiked = data.list.likes.find(like => like === user.id);
+        setIsLiked(!!userLiked);
+        setLikeCount(data.list.likes.length);
+    },[data, user]);
 
     useEffect(()=>{
-        if(!list) return;
+        if(!data) return;
         if(!user?.id || !clicked)return;
 
         if(isLiked)
-            list.likes.push(user?.id); 
+            data.list.likes.push(user?.id); 
         else
-            list.likes = list.likes.filter(like => like !== user.id);
+            data.list.likes = data.list.likes.filter(like => like !== user.id);
 
         updateLikes();
-        setLikeCount(list.likes.length);
+        setLikeCount(data.list.likes.length);
     },[isLiked]);
     
     const updateLikes = async () => {
-        if(!list || !user) return;
-        console.log(list);
-        const response = await listService.likeList(list);
+        if(!data || !user) return;
+        console.log(data.list);
+        const response = await listService.likeList(data.list);
         if(!response.ok){
             setError(await response.json());
         }
@@ -104,7 +99,7 @@ const ListDetails = () => {
     return (
         <>
             <Head>
-                <title>{list ? (list.title + "- Yadig") : "List Details"}</title>
+                <title>{data?.list ? (data.list.title + "- Yadig") : "List Details"}</title>
             </Head>
             <div className="flex flex-col h-screen">
                 <Header current="home" user={user}/>
@@ -118,21 +113,21 @@ const ListDetails = () => {
                     <div className="flex justify-center items-center">
                         <IconDisc height={100} width={100}/>
                     </div>
-                ):(list && 
+                ):(data && 
                         <div className="max-w-4xl mx-auto bg-text1 p-6 rounded-lg shadow-md">
                             <div className="flex justify-between pr-6">
-                                <h1 className="text-4xl font-bold mb-4 text-text2">{list?.title}</h1>
+                                <h1 className="text-4xl font-bold mb-4 text-text2">{data.list?.title}</h1>
                                 <div className="mb-4 flex gap-2">
                                     <h2 className="text-xl main-thin text-text2">By</h2>
                                     <Link
-                                        href={`/profile/${list.author.id}`}
+                                        href={`/profile/${data.list.author.id}`}
                                         className="text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100">
-                                        {list.author.username ?? 'Unknown'}
+                                        {data.list.author.username ?? 'Unknown'}
                                     </Link>
                                 </div>
                             </div>
                             <div className="m-5">
-                                <p className="main-thin text-md text-bg2">{list?.description}</p>
+                                <p className="main-thin text-md text-bg2">{data.list?.description}</p>
                             </div>
                             <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">
                                 <p> {likeCount} </p>
@@ -143,9 +138,9 @@ const ListDetails = () => {
                                 /> 
                             </span>
                             <h2 className="text-xl main-font text-center mb-2 text-text2">Albums</h2>
-                            {albums && albums.length > 0 && (
+                            {data.albums && data.albums.length > 0 && (
                                 <div className={`w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}>
-                                    {albums.map(album=>(
+                                    {data.albums.map(album=>(
                                        <AlbumCard key={album.id} album={album}/>
                                     ))}
                                 </div>
@@ -158,25 +153,20 @@ const ListDetails = () => {
     );
 };
 
-const fetchList = async (id: string): Promise<List> => {
-    const response = await listService.getListById(Number(id));
-
-    if (!response.ok) {
-        throw new Error("Couldn't find List");
+const fetchListWithAlbums = async (id: number): Promise<{list: List, albums: Album[]}> => {
+    const response = await listService.getListById(id);
+    if (!response.ok){
+        throw new Error("couldn't find list"); 
     }
-
-    return response.json();
-};
-
-const fetchAlbums = async (list: List | undefined): Promise<Album[]> => {
-    if(!list){throw new Error("cannot find list")}
-    const listAlbums: Album[] = await Promise.all(
-        list.albumIds.map(async (id: string) => {
-            const details = id.split('_')
-            return await albumService.fetchAlbum(details[0], details[1]);
-        })
+    const list: List = await response.json();
+    
+    const albumDetails = list.albumIds.map(id => id.split('_'));
+    const albums = await Promise.all(
+        albumDetails.map(([title, artist]) => 
+            albumService.fetchAlbum(title, artist)
+        )
     );
-    return listAlbums;
-};
 
+    return { list, albums };
+};
 export default ListDetails;
