@@ -11,6 +11,8 @@ export type UserInfo = {
     isBlocked?: boolean,
     reviews?: Review[],
     lists?: List[],
+    following?: number[],
+    followedBy?: number[],
 }
 
 export type ListInput = {

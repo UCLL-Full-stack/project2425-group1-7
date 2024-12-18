@@ -46,6 +46,30 @@ userRouter.put('/promote/:id', async (req: Request, res: Response, next: NextFun
     }
 });
 
+userRouter.put('/follow/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        const user = await userService.followUser(id, username);
+        res.status(200).json(user);
+    }catch(e){
+        next(e);
+    }
+});
+
+userRouter.put('/unfollow/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username} = request.auth;
+        const id = Number(req.params['id']);
+        const user = await userService.unfollowUser(id, username);
+        res.status(200).json(user);
+    }catch(e){
+        next(e);
+    }
+});
+
 userRouter.put('/block/:id', async (req: Request, res: Response, next: NextFunction) => {
     try{
         const request = req as Request & {auth: {role: Role}}

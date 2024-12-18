@@ -50,6 +50,8 @@ export type User = {
     isBlocked: boolean,
     lists?: List[],
     reviews?: Review[],
+    followedBy?: number[],
+    following?: number[],
 }
 
 export type List = {

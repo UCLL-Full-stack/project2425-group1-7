@@ -34,7 +34,7 @@ const createList = async (list: ListInput): Promise<List> => {
     }
 }
 
-const likeList = async (id: number, likes: number[]): Promise<List> => {
+const likeList = async (id: number, username: string): Promise<List> => {
     try{
         const list = listDb.getById(id);
         if(!list) throw new Error("List Doesn't exist");
@@ -43,7 +43,22 @@ const likeList = async (id: number, likes: number[]): Promise<List> => {
     }
 
     try{
-        return await listDb.likeList(id, likes);
+        return await listDb.likeList(id, username);
+    }catch(e){
+        throw e
+    }
+}
+
+const unlikeList = async (id: number, username: string): Promise<List> => {
+    try{
+        const list = listDb.getById(id);
+        if(!list) throw new Error("List Doesn't exist");
+    }catch(e){
+        throw e;
+    }
+
+    try{
+        return await listDb.unlikeList(id, username);
     }catch(e){
         throw e
     }
@@ -62,5 +77,6 @@ export default {
     getListById,
     createList,
     likeList,
+    unlikeList,
     deleteList
 }

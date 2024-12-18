@@ -85,15 +85,36 @@ const createReview = async (review: Review, authorId: number): Promise<Review>=>
     }
 }
 
-const likeReview = async (id:number, likes: number[]): Promise<Review> => {
+const unlikeReview = async (id:number, username: string): Promise<Review> => {
     try{
         const reviewPrisma = await database.review.update({
-            data:{
-                likes: {
-                    set: likes.map(id=>({id}))
-                }
-            },
             where: {id},
+            data:{
+                likes: { disconnect: {username}}
+            },
+            include: {
+                author: true,
+                comments: {
+                    include: {
+                        author: true
+                    }
+                },
+                likes: true
+            }
+        })
+        return Review.from(reviewPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
+    } 
+}
+
+const likeReview = async (id:number, username: string): Promise<Review> => {
+    try{
+        const reviewPrisma = await database.review.update({
+            where: {id},
+            data:{
+                likes: { connect: {username}}
+            },
             include: {
                 author: true,
                 comments: {
@@ -130,5 +151,6 @@ export default{
     findUserReviews,
     createReview,
     deleteReview,
-    likeReview
+    likeReview,
+    unlikeReview,
 }

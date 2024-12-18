@@ -35,6 +35,34 @@ const findById = async(id: number): Promise<Response>=>{
     });        
 }
 
+const followUser = async(id: number): Promise<Response> =>{
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/follow/${id}`,{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+        },
+    });        
+}
+
+const unfollowUser = async(id: number): Promise<Response> =>{
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/unfollow/${id}`,{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+        },
+    });        
+}
+
 const promoteUser = async(id: number): Promise<Response> =>{
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
@@ -79,6 +107,8 @@ export default {
     registerUser,
     logIn,
     findById,
+    followUser,
+    unfollowUser,
     promoteUser,
     blockAccount,
     isJwtExpired

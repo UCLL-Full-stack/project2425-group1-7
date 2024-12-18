@@ -1,4 +1,4 @@
-import { List, ListInput } from "@/types/index"
+import { ListInput } from "@/types/index"
 
 const getAllLists= async (): Promise<Response> => {
     return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists`, {
@@ -34,18 +34,31 @@ const createList = async (list: ListInput): Promise<Response> => {
     }); 
 }
 
-const likeList = async (list: List): Promise<Response> => {
+const likeList = async (id: number): Promise<Response> => {
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
     if (!user) return Response.error();
 
-    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/like/${list.id}`,{
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/like/${id}`,{
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${user.token}` 
         },
-        body: JSON.stringify(list.likes)
+    }); 
+}
+
+const unlikeList = async (id: number): Promise<Response> => {
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/unlike/${id}`,{
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.token}` 
+        },
     }); 
 }
 
@@ -68,5 +81,6 @@ export default {
     getListById,
     createList,
     likeList,
+    unlikeList,
     deleteList
 }

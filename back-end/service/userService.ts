@@ -65,7 +65,25 @@ const getById = async (id: number): Promise<UserInfo> => {
             createdAt: user.getCreatedAt(),
             reviews: user.getReviews(),
             lists: user.getLists(),
+            followedBy: user.getFollowers(),
         };
+    }catch(e){
+        throw e;
+    }
+}
+const followUser = async(id: number, username: string): Promise<number> =>{
+    try{
+        const user = await userDB.followUser(id, username);
+        return user.getId();
+    }catch(e){
+        throw e;
+    }
+}
+
+const unfollowUser = async(id: number, username: string): Promise<number> =>{
+    try{
+        const user = await userDB.unfollowUser(id, username);
+        return user.getId();
     }catch(e){
         throw e;
     }
@@ -120,6 +138,8 @@ export default {
     registerUser,
     loginUser,
     getById,
+    followUser,
+    unfollowUser,
     promoteUser,
     blockUser
 }

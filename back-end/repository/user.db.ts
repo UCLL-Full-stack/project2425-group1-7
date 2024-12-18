@@ -1,5 +1,5 @@
 import { User } from "../model/user"
-import { Role } from "../types";
+import { Role, UserInfo } from "../types";
 import database from "../util/database";
 
 const registerUser = async (user: User): Promise<User> => {
@@ -38,7 +38,9 @@ const findById = async (id: number): Promise<User> => {
                         },
                         likes: true
                     }
-                }
+                },
+                following: true,
+                followedBy: true,
             }
         });
         if(!userPrisma) throw new Error('user does not exist');
@@ -57,6 +59,34 @@ const findByEmail = async (email: string): Promise<User> => {
         return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");
+    }
+}
+
+const followUser = async (id: number, username: string): Promise<User>=>{
+    try{
+        const userPrisma = await database.user.update({
+            where: {id: id},
+            data:{
+                followedBy: {connect: {username}}
+            }
+        })
+        return User.from(userPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
+    }
+}
+
+const unfollowUser = async (id: number, username: string): Promise<User>=>{
+    try{
+        const userPrisma = await database.user.update({
+            where: {id},
+            data:{
+                followedBy: {disconnect: {username}}
+            }
+        })
+        return User.from(userPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
     }
 }
 
@@ -95,6 +125,8 @@ export default {
     registerUser,
     findByEmail,
     findById,
+    followUser,
+    unfollowUser,
     promoteById,
     blockById
 }
