@@ -34,14 +34,27 @@ const createReview = async (newReview: ReviewInput): Promise<Review> => {
     }
 };
 
-const likeReview = async (id: number, likes: number[]): Promise<Review> => {
+const unlikeReview = async (id: number, username: string): Promise<Review> => {
     const review = await reviewDb.findById(id);
     if(!review){
         throw new Error("Review Does not Exist");
     }
 
     try{
-        return await reviewDb.likeReview(id, likes);
+        return await reviewDb.unlikeReview(id, username);
+    }catch(e){
+        throw e;
+    }
+};
+
+const likeReview = async (id: number, username: string): Promise<Review> => {
+    const review = await reviewDb.findById(id);
+    if(!review){
+        throw new Error("Review Does not Exist");
+    }
+
+    try{
+        return await reviewDb.likeReview(id, username);
     }catch(e){
         throw e;
     }
@@ -60,5 +73,6 @@ export default{
     getReviewById,
     createReview,
     deleteReview,
-    likeReview
+    likeReview,
+    unlikeReview
 }

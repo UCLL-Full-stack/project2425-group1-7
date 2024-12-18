@@ -19,6 +19,8 @@ export class User{
     private isBlocked: boolean;
     private lists?: List[];
     private reviews?: Review[];
+    private followedBy?: number[];
+    private following?: number[];
 
     constructor(user: {
         id?: number;
@@ -29,7 +31,9 @@ export class User{
         role: Role,
         isBlocked?: boolean,
         lists?: List[],
-        reviews?: Review[]
+        reviews?: Review[],
+        followedBy?: number[]
+        following?: number[]
     }){
         this.validate(user);
         this.id = user.id;
@@ -41,6 +45,8 @@ export class User{
         this.createdAt = user.createdAt;
         this.lists = user.lists??[];
         this.reviews = user.reviews??[];
+        this.followedBy = user.followedBy??[]
+        this.following = user.following??[]
     }
     
     static from({
@@ -52,7 +58,9 @@ export class User{
         role,
         isBlocked,
         lists,
-        reviews
+        reviews,
+        followedBy,
+        following,
     }: UserPrisma & {
         lists?: (ListPrisma & {
             author: UserPrisma
@@ -62,7 +70,9 @@ export class User{
                 author: UserPrisma
             })[],
             author: UserPrisma
-        })[]
+        })[],
+        followedBy?: UserPrisma[],
+        following?: UserPrisma[],
     }): User{
         return new User({
             id: id,
@@ -72,8 +82,10 @@ export class User{
             password: password,
             role: role as Role,
             isBlocked: isBlocked,
-            lists: lists?.map((list)=>List.from(list))??[],
-            reviews: reviews?.map((review)=>Review.from(review))??[]
+            lists: lists?.map(list=>List.from(list))??[],
+            reviews: reviews?.map(review=>Review.from(review))??[],
+            followedBy: followedBy?.map(follower=>follower.id),
+            following: following?.map(following=>following.id)
         });
     }
 
@@ -100,6 +112,14 @@ export class User{
 
     getReviews(): Review[]{
         return this.reviews??[];
+    }
+    
+    getFollowers(): number[]{
+        return this.followedBy??[];
+    }
+
+    getFollowing(): number[]{
+        return this.following??[];
     }
 
     getCreatedAt(): Date{

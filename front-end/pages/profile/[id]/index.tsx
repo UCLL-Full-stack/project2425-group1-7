@@ -11,7 +11,7 @@ import userService from "@/services/userService";
 import { ListInput, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Profile: React.FC = () => {
 
@@ -22,13 +22,14 @@ const Profile: React.FC = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
     const [isDeleteReviewOpen, setIsDeleteReviewOpen] = useState<boolean>(false);
+    const [isFollowing, setIsFollowing] = useState<boolean>();
     const [selectedId, setSelectedId] = useState<number>(0);
     const [user, setUser] = useState<User>();
     const [sessionUser, setSessionUser] = useState<User>();
     const [isUserProfile, setIsUserProfile] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
 
-    const fetchUser = async (id: number) => {
+    const fetchUser = async (id: number, u: User) => {
         const response = await userService.findById(id);
         if (!response.ok){
             const res = await response.json();
@@ -36,7 +37,19 @@ const Profile: React.FC = () => {
             return;
         }
 
-        setUser(await response.json());
+        const fetchedUser: User = await response.json(); 
+        setUser(fetchedUser);
+
+
+        if(fetchedUser && u){
+            const following = fetchedUser.followedBy?.find(id=> id === u.id);
+            setIsFollowing(!!following);
+        }
+
+        setIsUserProfile(false);
+        if(u.id === id){
+            setIsUserProfile(true);
+        }
     }
 
 
@@ -64,12 +77,9 @@ const Profile: React.FC = () => {
 
         const id = Number(router.query.id);
         if(isNaN(id)) return;
-        fetchUser(id); 
 
-        setIsUserProfile(false);
-        if(u.id === id){
-            setIsUserProfile(true);
-        }
+        fetchUser(id, u); 
+
     }, [isListModalOpen, 
         isReviewModalOpen, 
         isDeleteListOpen, 
@@ -126,6 +136,18 @@ const Profile: React.FC = () => {
         }
     }
 
+    const handleFollowUser = async () => {
+        if (!user) return;
+        try {
+            const response = isFollowing? await userService.unfollowUser(user.id):await userService.followUser(user.id);
+            if (response.ok) {
+                setIsFollowing(!isFollowing);
+            }
+        } catch (error) {
+            console.error("Error following/unfollowing user", error);
+        }
+    }
+
     const togglePromoteModal = () => setIsPromoteModal(!isPromoteModal);
     const toggleBlockModal = () => setIsBlockModal(!isBlockModal);
     const toggleListModal = () => setIsListModalOpen(!isListModalOpen);
@@ -153,9 +175,24 @@ const Profile: React.FC = () => {
                     ):(user && sessionUser &&
                         <>
                             <div className="bg-bg1 sm:p-4 lg:pt-8 w-screen border-b border-bg3 grid justify-center gap-3">
-                                <span className="text-center main-font text-text2 text-4xl">
+                                <div className="flex gap-3 items-center justify-center">
+                                    <span className="text-center main-font text-text2 text-4xl">
                                     {user.username}
-                                </span>
+                                    </span>
+                                {!isUserProfile && sessionUser &&(
+                                    <button
+                                        onClick={handleFollowUser}
+                                        type="button"
+                                        className={`rounded-lg px-2 py-1 mt-2 main-font text-sm transition-colors duration-100 ${
+                                            isFollowing 
+                                                ? "bg-text2 text-text1 hover:bg-text1 hover:text-text2" 
+                                                : "bg-text1 text-text2 hover:bg-text2 hover:text-text1"
+                                        }`}
+                                    >
+                                        {isFollowing?"Unfollow": "Follow"}
+                                    </button>
+                                )}
+                                </div>
                                 <span className="text-center yadig-italic text-text2 text-xl">
                                     digging since {user.createdAt && new Date(user.createdAt).toLocaleDateString()}
                                 </span>

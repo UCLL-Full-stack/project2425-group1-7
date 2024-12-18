@@ -45,9 +45,23 @@ reviewRouter.delete("/:id", async(req: Request, res: Response, next: NextFunctio
 
 reviewRouter.put("/like/:id", async(req:Request, res: Response, next: NextFunction)=>{
     try{
-        const id = Number(req.params["id"]);
-        const likes: number[] = req.body;
-        const review = await reviewService.likeReview(id,likes);
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        await reviewService.likeReview(id, username);
+        res.status(200).json(id);
+    }catch(e){
+        next(e);
+    }
+});
+
+reviewRouter.put("/unlike/:id", async(req:Request, res: Response, next: NextFunction)=>{
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        await reviewService.unlikeReview(id, username);
+        res.status(200).json(id);
     }catch(e){
         next(e);
     }

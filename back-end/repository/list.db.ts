@@ -84,13 +84,29 @@ const createList = async (list: List, authorId: number): Promise<List> => {
     }
 }
 
-const likeList = async (id:number, likes: number[]): Promise<List> => {
+const likeList = async (id:number, username: string): Promise<List> => {
     try{
         const listPrisma = await database.list.update({
             data:{
-                likes: {
-                    set: likes.map(id=>({id}))
-                }
+                likes: { connect: {username}}
+            },
+            where: {id},
+            include: {
+                author: true,
+                likes: true
+            }
+        })
+        return List.from(listPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
+    } 
+}
+
+const unlikeList = async (id:number, username: string): Promise<List> => {
+    try{
+        const listPrisma = await database.list.update({
+            data:{
+                likes: { disconnect: {username}}
             },
             where: {id},
             include: {
@@ -121,5 +137,6 @@ export default {
     createList,
     getUserLists,
     likeList,
+    unlikeList,
     deleteList,
 }

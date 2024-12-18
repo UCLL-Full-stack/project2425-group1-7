@@ -43,7 +43,8 @@ export class Comment{
                 id: author.id,
                 role: author.role as Role,
                 username: author.username,
-                createdAt: author.createdAt
+                createdAt: author.createdAt,
+                isBlocked: author.isBlocked
             },
             reviewId: reviewId
         });

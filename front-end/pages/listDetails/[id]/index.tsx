@@ -16,7 +16,7 @@ const ListDetails = () => {
     const router = useRouter();
     const { id } = router.query;
 
-    const [isLiked, setIsLiked] = useState<boolean>(false);
+    const [isLiked, setIsLiked] = useState<boolean>();
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
     const [user, setUser] = useState<User>();
@@ -44,8 +44,8 @@ const ListDetails = () => {
 
             router.push("/login");
         };
-        getUser();
 
+        getUser();
     },[])
 
     if (user && user.isBlocked){
@@ -55,37 +55,38 @@ const ListDetails = () => {
     useEffect(()=>{
         if(!user || !data){
             setIsLoading(true);
-            return
-        }
-        setIsLoading(false);
-    }, [user, data])
-
-    useEffect(()=>{
-        if(!data || !user) {
             return;
         }
-        const userLiked = data.list.likes.find(like => like === user.id);
-        setIsLiked(!!userLiked);
+
+        if (data.list.author.isBlocked){
+            setError("List No Longer Exists");
+            setIsLoading(false);
+            return;
+        }
+
+        const likedByUser = data.list.likes.find(like => like === user.id);
+        setIsLiked(!!likedByUser);
         setLikeCount(data.list.likes.length);
-    },[data, user]);
+        setIsLoading(false);
+    }, [user, data])
 
     useEffect(()=>{
         if(!data) return;
         if(!user?.id || !clicked)return;
 
+        updateLikes();
         if(isLiked)
             data.list.likes.push(user?.id); 
         else
             data.list.likes = data.list.likes.filter(like => like !== user.id);
 
-        updateLikes();
         setLikeCount(data.list.likes.length);
     },[isLiked]);
     
     const updateLikes = async () => {
         if(!data || !user) return;
-        console.log(data.list);
-        const response = await listService.likeList(data.list);
+
+        const response = isLiked? await listService.likeList(data.list.id): await listService.unlikeList(data.list.id);
         if(!response.ok){
             setError(await response.json());
         }
@@ -93,11 +94,6 @@ const ListDetails = () => {
 
     const handleLike = ()=>{
         setClicked(true);
-        if(!user || !user.id) {
-            router.push("/login");
-            return;
-        }
-
         setIsLiked(!isLiked);
     };
 
@@ -118,7 +114,7 @@ const ListDetails = () => {
                     <div className="flex justify-center items-center">
                         <IconDisc height={100} width={100}/>
                     </div>
-                ):(data && 
+                ):(!error && data && user && 
                         <div className="max-w-4xl mx-auto bg-text1 p-6 rounded-lg shadow-md">
                             <div className="flex justify-between pr-6">
                                 <h1 className="text-4xl font-bold mb-4 text-text2">{data.list?.title}</h1>

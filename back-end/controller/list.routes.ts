@@ -105,11 +105,26 @@ listRouter.get('/:id', async (req: Request, res: Response, next: NextFunction)=>
 });
 
 listRouter.put('/like/:id', async (req: Request, res: Response, next: NextFunction)=>{
-    const id = Number(req.params["id"]);
-    const likes: number[] = req.body;
 
     try{
-        await listService.likeList(id, likes);
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        await listService.likeList(id, username);
+        res.status(200).json(id);
+    }catch(e){
+        next(e);
+    }
+});
+
+listRouter.put('/unlike/:id', async (req: Request, res: Response, next: NextFunction)=>{
+
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        await listService.unlikeList(id, username);
+        res.status(200).json(id);
     }catch(e){
         next(e);
     }
@@ -120,7 +135,7 @@ listRouter.delete('/:id', async (req:Request, res:Response, next: NextFunction)=
 
     try{
         await listService.deleteList(id);
-        res.status(200);
+        res.status(200).json(id);
     }catch(e){
         next(e); 
     }

@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-const ListDetails = () => {
+const reviewDetails = () => {
     const router = useRouter();
     const { id } = router.query;
 
@@ -63,16 +63,19 @@ const ListDetails = () => {
         getUser();
     },[])
 
-    useEffect(()=>{
+    if (user && user.isBlocked){
+        router.push('/blocked');
+    }
+
+    useEffect(() => {
         if (!review || !user || !album) {
             setIsLoading(true);
             return;
         }
-        setIsLoading(false);
-    })
 
-    useEffect(() => {
-        if (!review || !user) {
+        if (review.author.isBlocked){
+            setError("Review No Longer Exists");
+            setIsLoading(false);
             return;
         }
 
@@ -80,24 +83,25 @@ const ListDetails = () => {
         setIsLiked(!!userLiked);
         setLikeCount(review.likes.length);
         setComments(review.comments);
-    }, [review, user]);
+        setIsLoading(false);
+    }, [review, user, album]);
 
     useEffect(()=>{
         if(!review) return;
         if(!user?.id || !clicked)return;
 
+        updateLikes();
         if(isLiked)
             review.likes.push(user.id); 
         else
             review.likes = review.likes.filter(like => like !== user.id);
 
-        updateLikes();
         setLikeCount(review.likes.length);
     },[isLiked]);
     
     const updateLikes = async () => {
         if(!review || !user) return;
-        const response = await reviewService.likeReview(review);
+        const response = isLiked? await reviewService.likeReview(review.id): await reviewService.unlikeReview(review.id);
         if(!response.ok){
             setError(await response.json());
         }
@@ -153,8 +157,7 @@ const ListDetails = () => {
                     <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                         <span className="text-red-800 main-font">{error}</span>
                     </div>
-                )
-                }
+                )}
                 <main className="flex-1 bg-bg1 p-10 overflow-y-auto">
                 {isLoading?(
                     <div className="flex justify-center items-center">
@@ -244,7 +247,9 @@ const fetchReview = async (id: number): Promise<Review> => {
         throw new Error("Couldn't find review");
     }
 
-    return response.json();
+    const review: Review = await response.json();
+    review.comments = review.comments.filter(c=>!c.author.isBlocked);
+    return review;
 };
 
 const fetchAlbums = async (review: Review | undefined): Promise<Album> => {
@@ -253,4 +258,4 @@ const fetchAlbums = async (review: Review | undefined): Promise<Album> => {
     return await albumService.fetchAlbum(details[0], details[1]);
 };
 
-export default ListDetails;
+export default reviewDetails;

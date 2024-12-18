@@ -33,18 +33,31 @@ const createReview = async (review: ReviewInput): Promise<Response> => {
     }); 
 };
 
-const likeReview = async (review: Review): Promise<Response> => {
+const likeReview = async (id: number): Promise<Response> => {
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
     if (!user) return Response.error();
 
-    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/like/${review.id}`,{
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/like/${id}`,{
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${user.token}` 
         },
-        body: JSON.stringify(review.likes)
+    }); 
+}
+
+const unlikeReview = async (id: number): Promise<Response> => {
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/unlike/${id}`,{
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.token}` 
+        },
     }); 
 }
 
@@ -67,5 +80,6 @@ export default{
     getReviewById,
     createReview,
     likeReview,
+    unlikeReview,
     deleteReview
 }
