@@ -21,6 +21,17 @@ const Login: React.FC = () => {
         if (!response.ok){
             const message = await response.json();
             setPassword("");
+            switch (message.message){
+                case `user with Email ${email} already exists`:
+                    setError(message.message);
+                    break;
+                case "Invalid Credentials":
+                    setError(message.message);
+                    break;
+                default:
+                    setError("Log in error")
+                    break;
+            }
             setError(message.message); 
             return;
         }
@@ -32,7 +43,8 @@ const Login: React.FC = () => {
                 token: jwtResponse.token,
                 role: jwtResponse.role,
                 username: jwtResponse.username,
-                id: jwtResponse.id
+                id: jwtResponse.id,
+                isBlocked: jwtResponse.isBlocked
             })
         );
 
@@ -61,7 +73,7 @@ const Login: React.FC = () => {
                             onSubmit={(e) => handleSave(e)} 
                             className="px-8 sm:px-12 md:px-16 py-8 w-full sm:w-2/3 md:w-[30vw] lg:w-[25vw] bg-text1 rounded-t-lg">
                             <h2 className="text-3xl sm:text-4xl text-center text-text2 main-font mb-4 sm:mb-8 md:mb-10">Log In</h2>
-                            {error && 
+                            {error && !success &&
                                 <span className="block text-center main-font text-red-500 mb-4 sm:mb-6">{error}</span>
                             }
                             {success &&

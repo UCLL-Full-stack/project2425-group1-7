@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import userService from '../service/userService';
+import { Role } from '../types';
 
 export const userRouter = express.Router();
 
@@ -31,5 +32,17 @@ userRouter.post('/login', async (req: Request, res: Response, next: NextFunction
     }catch(e){
         next(e);
     }
+});
 
+
+userRouter.put('/block/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const request = req as Request & {auth: {role: Role}}
+        const {role}= request.auth;
+        const id = Number(req.params['id']);
+        const user = await userService.blockUser(id, role);
+        res.status(200).json(user);
+    }catch(e){
+        next(e);
+    }
 });

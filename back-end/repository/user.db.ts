@@ -40,11 +40,8 @@ const findById = async (id: number): Promise<User> => {
                 }
             }
         });
-        if(userPrisma) 
-            return User.from(userPrisma);
-        else
-            throw new Error("User doesn't Exist");
-
+        if(!userPrisma) throw new Error('user does not exist');
+        return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");
     }
@@ -52,16 +49,28 @@ const findById = async (id: number): Promise<User> => {
 
 const findByEmail = async (email: string): Promise<User> => {
     try{
-        const userPrisma = await database.user.findFirst({
+        const userPrisma = await database.user.findUnique({
             where: {email},
         });
-        if(userPrisma) 
-            return User.from(userPrisma);
-        else
-            throw new Error("User doesn't Exist");
-
+        if(!userPrisma) throw new Error(`${email} is not associated to any account`);
+        return User.from(userPrisma);
     }catch(e){
-        throw new Error("DB Error: "+ e);
+        throw new Error("DB Error");
+    }
+}
+
+const blockById = async (id: number, isBlocked: boolean): Promise<User> =>{
+    try{
+        const userPrisma = await database.user.update({
+            where: {id},
+            data:{
+                isBlocked: !isBlocked
+            }
+        })
+        if(!userPrisma) throw new Error('user does not exist');
+        return User.from(userPrisma);
+    }catch(e){
+        throw new Error("DB Error");
     }
 }
 
@@ -69,4 +78,5 @@ export default {
     registerUser,
     findByEmail,
     findById,
+    blockById
 }

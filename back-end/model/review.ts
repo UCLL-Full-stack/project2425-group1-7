@@ -60,6 +60,7 @@ export class Review{
             author: {
                 id: author.id, 
                 role: author.role as Role,
+                isBlocked: author.isBlocked,
                 username: author.username,
                 createdAt: author.createdAt
             },

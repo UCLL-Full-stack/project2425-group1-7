@@ -5,9 +5,10 @@ export type Role = 'admin' | 'moderator' | 'user'
 
 export type UserInfo = {
     id: number,
+    createdAt: Date,
     username: string,
     role: Role,
-    createdAt: Date,
+    isBlocked?: boolean,
     reviews?: Review[],
     lists?: List[],
 }
@@ -43,5 +44,6 @@ export type AuthResponse = {
     token: string,
     role: Role,
     id: number,
-    username: string
+    username: string,
+    isBlocked: boolean,
 }

@@ -45,7 +45,7 @@ app.use('/reviews', reviewRouter);
 app.use('/comments', commentRouter);
 app.use((err: Error, req: Request, res: Response, next: NextFunction)=>{
     console.log(err.message);
-    res.status(400).json({status: 'application error', message: "check server Log for error details"});
+    res.status(400).json({status: 'application error', message: err.message});
 });
 
 const swaggerOpts = {

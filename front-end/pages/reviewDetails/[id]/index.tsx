@@ -45,17 +45,18 @@ const ListDetails = () => {
     useEffect(()=>{
         const getUser = () => {
             const userString = sessionStorage.getItem("LoggedInUser");
-            const u = JSON.parse(userString ?? "");
-            if (!userString || userService.isJwtExpired(u.token)) {
-                router.push("/login");
+            if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
+                const u = JSON.parse(userString);
+                setUser({
+                    id: u.id,
+                    username: u.username,
+                    isBlocked: u.isBlocked,
+                    role: u.role
+                });
                 return;
             }
-            setUser({
-                id: u.id,
-                username: u.username,
-                createdAt: u.createdAt,
-                role: u.role
-            });
+
+            router.push("/login");
         };
 
         getUser();

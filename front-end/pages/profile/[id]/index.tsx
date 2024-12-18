@@ -11,11 +11,12 @@ import userService from "@/services/userService";
 import { ListInput, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 const Profile: React.FC = () => {
 
     const router = useRouter();
+    const [isBlockModal, setIsBlockModal] = useState<boolean>(false);
     const [isListModalOpen, setIsListModalOpen] = useState<boolean>(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
@@ -37,6 +38,11 @@ const Profile: React.FC = () => {
         setUser(await response.json());
     }
 
+
+    if (sessionUser && sessionUser.isBlocked){
+        router.push('/blocked');
+    }
+
     useEffect(() => {
         const userString = sessionStorage.getItem("LoggedInUser");
         if(!userString || 
@@ -51,9 +57,9 @@ const Profile: React.FC = () => {
             id: u.id,
             username: u.username,
             createdAt: u.createdAt,
+            isBlocked: u.isBlocked,
             role: u.role
         });
-
 
         const id = Number(router.query.id);
         if(isNaN(id)) return;
@@ -66,6 +72,7 @@ const Profile: React.FC = () => {
         isReviewModalOpen, 
         isDeleteListOpen, 
         isDeleteReviewOpen, 
+        isBlockModal,
         router
     ]);
 
@@ -79,6 +86,15 @@ const Profile: React.FC = () => {
         const newList = await reviewService.createReview(review);
         console.log(newList);
         toggleReviewModal();
+    }
+
+    const handleBlockUser = async () => {
+        if(!user)return;
+        const response = await userService.blockAccount(user.id);
+        if (!response.ok){
+            setError("Error Blocking User");
+        }
+        toggleBlockModal();
     }
 
     const handleDeleteList = async () => {
@@ -97,14 +113,15 @@ const Profile: React.FC = () => {
         }
     }
 
+    const toggleBlockModal = () => setIsBlockModal(!isBlockModal);
     const toggleListModal = () => setIsListModalOpen(!isListModalOpen);
     const toggleReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
-    const toggleDeleteList = (id: number) => {
-        setSelectedId(id)
+    const toggleDeleteList = (id?: number) => {
+        setSelectedId(id??-1)
         setIsDeleteListOpen(!isDeleteListOpen);
     }
-    const toggleDeleteReview = (id: number) => {
-        setSelectedId(id)
+    const toggleDeleteReview = (id?: number) => {
+        setSelectedId(id??-1)
         setIsDeleteReviewOpen(!isDeleteReviewOpen);
     }
 
@@ -119,76 +136,104 @@ const Profile: React.FC = () => {
                         <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                             <span className="text-red-800 main-font">{error}</span>
                         </div>
-                    ):(user && 
+                    ):(user && sessionUser &&
                         <>
-                            <div className="bg-bg1 sm:p-4 lg:p-8 w-screen border-b border-bg3 grid gap-3">
+                            <div className="bg-bg1 sm:p-4 lg:pt-8 w-screen border-b border-bg3 grid justify-center gap-3">
                                 <span className="text-center main-font text-text2 text-4xl">
                                     {user.username}
                                 </span>
                                 <span className="text-center yadig-italic text-text2 text-xl">
                                     digging since {new Date(user.createdAt).toLocaleDateString()}
                                 </span>
-                                    
+                                <div className="grid grid-cols-2 justify-center gap-4 max-w-[25vw]">
+                                {sessionUser.role === "admin" && !isUserProfile && (
+                                    <>
+                                        <button
+                                            onClick={toggleBlockModal}
+                                            type="button"
+                                            className="rounded-lg px-3 py-2 main-font text-sm text-white hover:bg-text2 hover:text-red-500 bg-red-500 transition-colors duration-100"
+                                        >
+                                            Block Account
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`${user.role == 'user'? "text-text2 bg-text1 hover:bg-text2 hover:text-text1": "text-text1 bg-text2 hover:bg-red-500 hover:text-text2"} rounded-lg px-3 py-2 main-font text-sm transition-colors duration-100`}
+                                        >
+                                        {user.role == 'user'? "Promote to Moderator": "Demote to user"}
+                                        </button>
+                                    </>
+                                )}
+                                </div>
                             </div>
                             {(user.role === "admin" || user.role === "moderator") && (
                                 <span className="text-center bg-bg1 border-b border-bg3  main-thin text-green-500 text-xl">
                                 {user.role.toUpperCase()}
                                 </span>
                             )}
-                            <main className="flex-1 flex flex-col lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
-                                <div className="w-full lg:w-1/2 lg:pr-10 mb-6 lg:mb-0">
-                                    <div className="relative flex items-center justify-center">
-                                    {isUserProfile ? (
-                                        <>
-                                            <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Reviews</h1>
-                                            <button
-                                                onClick={toggleReviewModal}
-                                                type="button"
-                                                className="absolute right-0 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
-                                            >
-                                                <IconAdd width={20} height={20}/>
-                                            </button>
-                                        </>
-                                    ):(
-                                        <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Reviews</h1>
-                                    )}
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 justify-center pt-6 sm:pt-10 gap-4">
-                                    {user.reviews && user.reviews.length > 0 ? user.reviews.map((review) => (
-                                            <ReviewCard key={review.id} review={review} onDelete={isUserProfile?handleDeleteReview:undefined} userId={user.id}/>
-                                    )) : (
-                                            <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Reviews To Show</h2>
-                                    )}
-                                    </div>
-                                </div>
-
-                                <div className="w-full lg:w-1/2 lg:pl-10">
-                                    <div className="relative flex items-center justify-center">
-                                    {isUserProfile ? (
-                                        <>
-                                            <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Lists</h1>
-                                            <button
-                                                onClick={toggleListModal}
-                                                type="button"
-                                                className="absolute right-0 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
-                                            >
-                                                <IconAdd width={20} height={20}/>
-                                            </button>
-                                        </>
-                                    ):(
-                                        <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Lists</h1>
-                                    )}
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 sm:pt-10 gap-4">
-                                        {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
-                                            <ListCard key={list.id} list={list}  onDelete={isUserProfile?handleDeleteList:undefined} userId={user.id}/>
-                                        )) : (
-                                            <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Lists To Show</h2>
+                            {user.isBlocked ? (
+                                <>
+                                <span className="text-center bg-text1 border-b border-bg3  main-thin text-red-500 text-xl">
+                                    BLOCKED BY ADMIN
+                                </span>
+                                <main className="flex-1 flex flex-col lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
+                                </main>
+                                </>
+                            ):(
+                                <main className="flex-1 flex flex-col lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
+                                    <div className="w-full lg:w-1/2 lg:pr-10 mb-6 lg:mb-0">
+                                        <div className="relative flex items-center justify-center">
+                                        {isUserProfile ? (
+                                            <>
+                                                <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Reviews</h1>
+                                                <button
+                                                    onClick={toggleReviewModal}
+                                                    type="button"
+                                                    className="absolute right-0 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
+                                                >
+                                                    <IconAdd width={20} height={20}/>
+                                                </button>
+                                            </>
+                                        ):(
+                                            <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Reviews</h1>
                                         )}
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 justify-center pt-6 sm:pt-10 gap-4">
+                                        {user.reviews && user.reviews.length > 0 ? user.reviews.map((review) => (
+                                                <ReviewCard key={review.id} review={review} onDelete={isUserProfile?toggleDeleteReview:undefined} userId={user.id}/>
+                                        )) : (
+                                                <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Reviews To Show</h2>
+                                        )}
+                                        </div>
                                     </div>
-                                </div>
 
-                            </main>
+                                    <div className="w-full lg:w-1/2 lg:pl-10">
+                                        <div className="relative flex items-center justify-center">
+                                        {isUserProfile ? (
+                                            <>
+                                                <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Lists</h1>
+                                                <button
+                                                    onClick={toggleListModal}
+                                                    type="button"
+                                                    className="absolute right-0 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
+                                                >
+                                                    <IconAdd width={20} height={20}/>
+                                                </button>
+                                            </>
+                                        ):(
+                                            <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Lists</h1>
+                                        )}
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 sm:pt-10 gap-4">
+                                            {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
+                                                <ListCard key={list.id} list={list}  onDelete={isUserProfile?toggleDeleteList:undefined} userId={user.id}/>
+                                            )) : (
+                                                <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Lists To Show</h2>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                </main>
+                            )}
                             {isListModalOpen && user && (
                                 <ListModal 
                                     isOpen={isListModalOpen} 
@@ -219,6 +264,13 @@ const Profile: React.FC = () => {
                                     handler={handleDeleteReview} 
                                     onClose={toggleDeleteReview}
                                     message={`Deleting Review !`}
+                                    />
+                            )}
+                            {isBlockModal && user && (
+                                <ConfirmModal 
+                                    handler={handleBlockUser} 
+                                    onClose={toggleBlockModal}
+                                    message={`Block ${user.username}`}
                                     />
                             )}
                         </>
