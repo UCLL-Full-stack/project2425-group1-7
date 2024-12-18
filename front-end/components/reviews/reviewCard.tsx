@@ -6,6 +6,7 @@ import IconComment from "../ui/comment";
 import IconDelete from "../ui/delete";
 import IconEdit from "../ui/edit";
 import IconLike from "../ui/like";
+import React from "react";
 
 type Props = {
     review: Review;
