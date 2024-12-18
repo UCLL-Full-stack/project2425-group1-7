@@ -14,20 +14,21 @@
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "preserve",
     "incremental": true,
     "paths": {
       "@/*": [
         "./*"
       ]
     },
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "pages/listsDetails/[id]"  ],
+    "**/*.tsx",
+    "pages/listsDetails/[id]"
+  ],
   "exclude": [
     "node_modules"
   ]
