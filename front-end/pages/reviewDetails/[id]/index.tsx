@@ -17,7 +17,7 @@ const ReviewDetailsPage = () => {
     const { id } = router.query;
     const [user, setUser] = useState<User>();
 
-    const { data: review } = useSWR<Review>(id ? `review/${id}` : null, () => fetchReview(Number(id)));
+    const { data: review, error: reviewError } = useSWR<Review>(id ? `review/${id}` : null, () => fetchReview(Number(id)));
 
     const [comments, setComments] = useState<Comment[]>([]);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -44,6 +44,16 @@ const ReviewDetailsPage = () => {
         }
     }, [review]);
 
+    useEffect(() => {
+        if (reviewError) {
+            setError(reviewError.message);
+        } else if (review?.author.isBlocked) {
+            setError("List No Longer Exists");
+        } else {
+            setError("");
+        }
+    }, [reviewError, review]);
+
     const handleClickComment = () => {
         setDisplayComments(!displayComments);
     };
@@ -62,7 +72,7 @@ const ReviewDetailsPage = () => {
     };
 
     const handleDeleteComment = async () => {
-        setDeleteModal(false);
+        toggleDeleteComment();
         if (!review) return;
         const response = await commentService.deleteComment(selectedComment);
         if (!response.ok) {
@@ -73,10 +83,12 @@ const ReviewDetailsPage = () => {
         setSelectedComment(-1);
     };
 
-    const toggleDeleteComment = (id: number) => {
-        setSelectedComment(id);
-        setDeleteModal(true);
+    const toggleDeleteComment = (id?: number) => {
+        setSelectedComment(id??-1);
+        setDeleteModal(!deleteModal);
     };
+
+    const isLoading = !review && !reviewError;
 
     return (
         <>
@@ -86,7 +98,11 @@ const ReviewDetailsPage = () => {
             <div className="flex flex-col h-screen">
                 <Header current="home" user={user} />
                 <main className="flex-1 bg-bg1 p-10 overflow-y-auto">
-                    {review && user ? (
+                    {isLoading ? (
+                        <div className="flex justify-center items-center">
+                            <IconDisc height={100} width={100}/>
+                        </div>
+                    ) : review && user && (
                         <>
                             <ReviewDetails
                                 user={user}
@@ -120,14 +136,11 @@ const ReviewDetailsPage = () => {
                                     id={selectedComment}
                                     handler={handleDeleteComment}
                                     onClose={toggleDeleteComment}
+                                    isDeleting={true}
                                     message={`Delete Comment?`}
                                 />
                             )}
                         </>
-                    ) : (
-                        <div className="flex justify-center items-center">
-                            <IconDisc height={100} width={100} />
-                        </div>
                     )}
                 </main>
             </div>

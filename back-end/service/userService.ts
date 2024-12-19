@@ -89,6 +89,7 @@ const getById = async (id: number): Promise<UserInfo> => {
             reviews: user.getReviews(),
             lists: user.getLists(),
             followedBy: user.getFollowers(),
+            following: user.getFollowing(),
         };
     }catch(e){
         throw e;

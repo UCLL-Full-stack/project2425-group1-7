@@ -80,7 +80,7 @@ const AlbumOverviewPage = () => {
                         <>
                         <span className="text-text2 main-font text-2xl">Popular Reviews</span>
                         {reviews.length>0 ? reviews.map(r => <ReviewDetails review={r} user={user} handleClickComment={handleReviewDetails}/>)
-                            : <p className="flex items-center">This Album hasn't been reviews yet</p>
+                            : <p className="flex items-center main-thin text-text2">This Album hasn't been reviewed yet</p>
                         }
                         </>
 
