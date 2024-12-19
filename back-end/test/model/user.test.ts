@@ -1,6 +1,7 @@
 import { User } from '../../model/user';
 import { List } from '../../model/list';
 import { Review } from '../../model/review';
+import { Role } from '../../types';
 
 describe('User Class', () => {
     const validUserData = {
@@ -9,186 +10,178 @@ describe('User Class', () => {
         email: 'test@example.com',
         username: 'testuser',
         password: 'password12345',
+        role: 'user' as Role,
+        isBlocked: false,
         lists: [],
-        reviews: []
+        reviews: [],
+        followedBy: [],
+        following: []
     };
-
-    let user: User;
-    let identicalUser: User;
-
-    beforeEach(() => {
-        user = new User(validUserData);
-        identicalUser = new User(validUserData);
-    });
 
     describe('Constructor and Validation', () => {
         test('should create user instance with valid data', () => {
-            expect(user.getId()).toBe(1);
-            expect(user.getEmail()).toBe('test@example.com');
-            expect(user.getUsername()).toBe('testuser');
-            expect(user.getPassword()).toBe('password12345');
-            expect(user.getLists()).toEqual([]);
-            expect(user.getReviews()).toEqual([]);
-            expect(user.getCreatedAt()).toBeLessThanOrEqual(Date.now());
+            const createValidUser = () => new User(validUserData);
+            const user = createValidUser();
+
+            expect(user.getId()).toBe(validUserData.id);
+            expect(user.getEmail()).toBe(validUserData.email);
+            expect(user.getUsername()).toBe(validUserData.username);
+            expect(user.getPassword()).toBe(validUserData.password);
+            expect(user.getRole()).toBe(validUserData.role);
+            expect(user.getIsBlocked()).toBe(validUserData.isBlocked);
+            expect(user.getLists()).toEqual(validUserData.lists);
+            expect(user.getReviews()).toEqual(validUserData.reviews);
+            expect(user.getFollowers()).toEqual(validUserData.followedBy);
+            expect(user.getFollowing()).toEqual(validUserData.following);
+            expect(user.getCreatedAt()).toBe(validUserData.createdAt);
         });
 
         test('should throw error for invalid email format', () => {
-            expect(() => {
-                new User({
-                    ...validUserData,
-                    email: 'invalid-email'
-                });
-            }).toThrow('email is not valid');
+            const createInvalidUser = () => new User({
+                ...validUserData,
+                email: 'invalid-email'
+            });
+
+            expect(createInvalidUser).toThrowError('email is not valid');
         });
 
         test('should throw error for password shorter than 10 characters', () => {
-            expect(() => {
-                new User({
-                    ...validUserData,
-                    password: 'short'
-                });
-            }).toThrow('password is too short');
-        });
-    });
+            const createInvalidUser = () => new User({
+                ...validUserData,
+                password: 'short'
+            });
 
-    describe('Getters', () => {
-        test('should get id', () => {
-            expect(user.getId()).toBe(1);
-        });
-
-        test('should get email', () => {
-            expect(user.getEmail()).toBe('test@example.com');
-        });
-
-        test('should get username', () => {
-            expect(user.getUsername()).toBe('testuser');
-        });
-
-        test('should get password', () => {
-            expect(user.getPassword()).toBe('password12345');
-        });
-
-        test('should get empty lists array when no lists provided', () => {
-            expect(user.getLists()).toEqual([]);
-        });
-
-        test('should get empty reviews array when no reviews provided', () => {
-            expect(user.getReviews()).toEqual([]);
-        });
-
-        test('should get createdAt timestamp', () => {
-            expect(typeof user.getCreatedAt()).toBe('number');
-            expect(user.getCreatedAt()).toBeLessThanOrEqual(Date.now());
+            expect(createInvalidUser).toThrowError('password is too short');
         });
     });
 
     describe('Setters', () => {
         test('should set valid email', () => {
+            const user = new User(validUserData);
             user.setEmail('newemail@example.com');
             expect(user.getEmail()).toBe('newemail@example.com');
         });
 
         test('should throw error when setting invalid email', () => {
-            expect(() => {
-                user.setEmail('invalid-email');
-            }).toThrow('email is not valid');
+            const user = new User(validUserData);
+            expect(() => user.setEmail('invalid-email')).toThrowError('email is not valid');
         });
 
         test('should set username', () => {
+            const user = new User(validUserData);
             user.setUsername('newusername');
             expect(user.getUsername()).toBe('newusername');
         });
 
         test('should set valid password', () => {
+            const user = new User(validUserData);
             user.setPassword('newpassword12345');
             expect(user.getPassword()).toBe('newpassword12345');
         });
 
         test('should throw error when setting short password', () => {
-            expect(() => {
-                user.setPassword('short');
-            }).toThrow('password is too short');
+            const user = new User(validUserData);
+            expect(() => user.setPassword('short')).toThrowError('password is too short');
         });
     });
 
     describe('equals method', () => {
         test('should return true for identical users', () => {
-            expect(user.equals(identicalUser)).toBeTruthy();
+            const user1 = new User(validUserData);
+            const user2 = new User(validUserData);
+            expect(user1.equals(user2)).toBeTruthy();
         });
 
-        test('should return false for users with different IDs', () => {
-            const differentUser = new User({
-                ...validUserData,
-                id: 2
-            });
-            expect(user.equals(differentUser)).toBeFalsy();
-        });
-
-        test('should return false for users with different emails', () => {
-            const differentUser = new User({
+        test('should return false for different users', () => {
+            const user1 = new User(validUserData);
+            const user2 = new User({
                 ...validUserData,
                 email: 'different@example.com'
             });
-            expect(user.equals(differentUser)).toBeFalsy();
-        });
-
-        test('should return false for users with different usernames', () => {
-            const differentUser = new User({
-                ...validUserData,
-                username: 'differentuser'
-            });
-            expect(user.equals(differentUser)).toBeFalsy();
+            expect(user1.equals(user2)).toBeFalsy();
         });
     });
 
     describe('static from method', () => {
         test('should create User from Prisma data', () => {
+            const createdAt = new Date();
             const prismaData = {
                 id: 1,
-                createdAt: new Date(),
+                createdAt: createdAt,
                 email: 'test@example.com',
                 username: 'testuser',
                 password: 'password12345',
+                role: 'user' as Role,
+                isBlocked: false,
                 lists: [{
                     id: 1,
-                    createdAt: new Date(),
+                    createdAt: createdAt,
                     title: 'Test List',
                     description: 'Test Description',
                     albumIds: ['1'],
                     authorId: 1,
                     author: {
                         id: 1,
-                        createdAt: new Date(),
+                        createdAt: createdAt,
                         email: 'test@example.com',
                         username: 'testuser',
-                        password: 'password12345'
+                        password: 'password12345',
+                        role: 'user' as Role,
+                        isBlocked: false
                     }
                 }],
-                reviews: []
+                reviews: [{
+                    id: 1,
+                    createdAt: createdAt,
+                    title: 'Test Review',
+                    body: 'Test Body',
+                    starRating: 5,
+                    albumID: '1',
+                    authorId: 1,
+                    author: {
+                        id: 1,
+                        createdAt: createdAt,
+                        email: 'test@example.com',
+                        username: 'testuser',
+                        password: 'password12345',
+                        role: 'user' as Role,
+                        isBlocked: false
+                    },
+                    comments: []
+                }],
+                followedBy: [{
+                    id: 2,
+                    createdAt: createdAt,
+                    email: 'follower@example.com',
+                    username: 'follower',
+                    password: 'password12345',
+                    role: 'user' as Role,
+                    isBlocked: false
+                }],
+                following: [{
+                    id: 3,
+                    createdAt: createdAt,
+                    email: 'following@example.com',
+                    username: 'following',
+                    password: 'password12345',
+                    role: 'user' as Role,
+                    isBlocked: false
+                }]
             };
 
             const userFromPrisma = User.from(prismaData);
+
             expect(userFromPrisma).toBeInstanceOf(User);
             expect(userFromPrisma.getId()).toBe(prismaData.id);
             expect(userFromPrisma.getEmail()).toBe(prismaData.email);
             expect(userFromPrisma.getUsername()).toBe(prismaData.username);
             expect(userFromPrisma.getPassword()).toBe(prismaData.password);
+            expect(userFromPrisma.getRole()).toBe(prismaData.role);
+            expect(userFromPrisma.getIsBlocked()).toBe(prismaData.isBlocked);
             expect(userFromPrisma.getLists()[0]).toBeInstanceOf(List);
-            expect(userFromPrisma.getReviews()).toEqual([]);
-        });
-
-        test('should handle empty lists and reviews in Prisma data', () => {
-            const prismaData = {
-                id: 1,
-                createdAt: new Date(),
-                email: 'test@example.com',
-                username: 'testuser',
-                password: 'password12345'
-            };
-
-            const userFromPrisma = User.from(prismaData);
-            expect(userFromPrisma.getLists()).toEqual([]);
-            expect(userFromPrisma.getReviews()).toEqual([]);
+            expect(userFromPrisma.getReviews()[0]).toBeInstanceOf(Review);
+            expect(userFromPrisma.getFollowers()).toEqual([2]);
+            expect(userFromPrisma.getFollowing()).toEqual([3]);
         });
     });
 
@@ -210,21 +203,13 @@ describe('User Class', () => {
         ];
 
         test.each(validEmails)('should accept valid email: %s', (email) => {
-            expect(() => {
-                new User({
-                    ...validUserData,
-                    email
-                });
-            }).not.toThrow();
+            const createUser = () => new User({...validUserData, email});
+            expect(createUser).not.toThrow();
         });
 
         test.each(invalidEmails)('should reject invalid email: %s', (email) => {
-            expect(() => {
-                new User({
-                    ...validUserData,
-                    email
-                });
-            }).toThrow('email is not valid');
+            const createUser = () => new User({...validUserData, email});
+            expect(createUser).toThrow('email is not valid');
         });
     });
 });

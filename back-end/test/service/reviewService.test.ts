@@ -1,228 +1,214 @@
 import { Review } from '../../model/review';
 import reviewService from '../../service/reviewService';
 import reviewDb from '../../repository/review.db';
-import { ReviewInput } from '../../types';
-import { User } from '../../model/user';
-import { UserInfo } from '../../types';
-
-const mockUser = new User({
-    id: 1,
-    createdAt: new Date(),
-    email: 'test@test.com',
-    username: 'testUser',
-    password: 'password12345',
-    lists: [],
-    reviews: []
-});
-
-const mockUserInfo: UserInfo = {
-    id: 1,
-    email: 'test@test.com',
-    username: 'testUser'
-}
-
-// Create mock review
-const mockReview = new Review({
-    id: 1,
-    author: mockUserInfo,
-    title: 'Great Album',
-    body: 'This album is amazing!',
-    starRating: 5,
-    albumId: '123',
-    createdAt: new Date(),
-});
-
-const mockReviewInput: ReviewInput = {
-    title: 'Great Album',
-    body: 'This album is amazing!',
-    starRating: 5,
-    albumId: '123',
-    authorId: 1
-};
-
-// Setup mocks
-let findAllReviewsMock: jest.Mock;
-let findByIdMock: jest.Mock;
-let findUserReviewsMock: jest.Mock;
-let createReviewMock: jest.Mock;
-let likeReviewMock: jest.Mock;
-let deleteReviewMock: jest.Mock;
-
-beforeEach(() => {
-    findAllReviewsMock = jest.fn();
-    findByIdMock = jest.fn();
-    findUserReviewsMock = jest.fn();
-    createReviewMock = jest.fn();
-    likeReviewMock = jest.fn();
-    deleteReviewMock = jest.fn();
-
-    // Setup db mocks
-    reviewDb.findAllReviews = findAllReviewsMock;
-    reviewDb.findById = findByIdMock;
-    reviewDb.findUserReviews = findUserReviewsMock;
-    reviewDb.createReview = createReviewMock;
-    reviewDb.likeReview = likeReviewMock;
-    reviewDb.deleteReview = deleteReviewMock;
-});
-
-afterEach(() => {
-    jest.clearAllMocks();
-});
+import { ReviewInput, Role, UserInfo } from '../../types';
 
 describe('Review Service', () => {
+    const mockUserInfo: UserInfo = {
+        id: 1,
+        username: 'testUser',
+        role: 'user' as Role,
+        createdAt: new Date(),
+        isBlocked: false,
+        lists: [],
+        reviews: [],
+        following: [],
+        followedBy: []
+    };
+
+    const mockReview = new Review({
+        id: 1,
+        author: mockUserInfo,
+        title: 'Great Album',
+        body: 'This album is amazing!',
+        starRating: 5,
+        albumId: '123',
+        createdAt: new Date(),
+    });
+
+    const mockReviewInput: ReviewInput = {
+        title: 'Great Album',
+        body: 'This album is amazing!',
+        starRating: 5,
+        albumId: '123',
+        authorId: 1
+    };
+
+    let findAllReviewsMock: jest.Mock;
+    let findByIdMock: jest.Mock;
+    let findByAlbumIdMock: jest.Mock;
+    let createReviewMock: jest.Mock;
+    let editReviewMock: jest.Mock;
+    let likeReviewMock: jest.Mock;
+    let unlikeReviewMock: jest.Mock;
+    let deleteReviewMock: jest.Mock;
+
+    beforeEach(() => {
+        findAllReviewsMock = jest.fn();
+        findByIdMock = jest.fn();
+        findByAlbumIdMock = jest.fn();
+        createReviewMock = jest.fn();
+        editReviewMock = jest.fn();
+        likeReviewMock = jest.fn();
+        unlikeReviewMock = jest.fn();
+        deleteReviewMock = jest.fn();
+
+        reviewDb.findAllReviews = findAllReviewsMock;
+        reviewDb.findById = findByIdMock;
+        reviewDb.findByAlbumId = findByAlbumIdMock;
+        reviewDb.createReview = createReviewMock;
+        reviewDb.editReview = editReviewMock;
+        reviewDb.likeReview = likeReviewMock;
+        reviewDb.unlikeReview = unlikeReviewMock;
+        reviewDb.deleteReview = deleteReviewMock;
+    });
+
     describe('getAllReviews', () => {
         test('should return all reviews', async () => {
-            // Given
             findAllReviewsMock.mockResolvedValue([mockReview]);
 
-            // When
-            const reviews = await reviewService.getAllReviews();
-
-            // Then
+            await expect(reviewService.getAllReviews()).resolves.toEqual([mockReview]);
             expect(findAllReviewsMock).toHaveBeenCalled();
-            expect(reviews).toEqual([mockReview]);
         });
 
-        test('should handle db error', async () => {
-            // Given
+        test('should propagate database errors', async () => {
             findAllReviewsMock.mockRejectedValue(new Error('DB Error'));
 
-            // Then
             await expect(reviewService.getAllReviews()).rejects.toThrow('DB Error');
         });
     });
 
     describe('getReviewById', () => {
         test('should return review by id', async () => {
-            // Given
             findByIdMock.mockResolvedValue(mockReview);
 
-            // When
-            const review = await reviewService.getReviewById(1);
-
-            // Then
+            await expect(reviewService.getReviewById(1)).resolves.toEqual(mockReview);
             expect(findByIdMock).toHaveBeenCalledWith(1);
-            expect(review).toEqual(mockReview);
         });
 
         test('should throw error if review not found', async () => {
-            // Given
             findByIdMock.mockResolvedValue(null);
 
-            // Then
-            await expect(reviewService.getReviewById(999))
-                .rejects
-                .toThrow('review not found');
+            await expect(reviewService.getReviewById(999)).rejects.toThrow('review not found');
         });
     });
 
-    describe('getUserReviews', () => {
-        test('should return reviews for user', async () => {
-            // Given
-            findUserReviewsMock.mockResolvedValue([mockReview]);
+    describe('getAlbumReviews', () => {
+        test('should return reviews for album', async () => {
+            findByAlbumIdMock.mockResolvedValue([mockReview]);
 
-            // When
-            const reviews = await reviewService.getUserReviews(1);
-
-            // Then
-            expect(findUserReviewsMock).toHaveBeenCalledWith(1);
-            expect(reviews).toEqual([mockReview]);
+            await expect(reviewService.getAlbumReviews('123')).resolves.toEqual([mockReview]);
+            expect(findByAlbumIdMock).toHaveBeenCalledWith('123');
         });
 
-        test('should handle db error', async () => {
-            // Given
-            findUserReviewsMock.mockRejectedValue(new Error('DB Error'));
+        test('should throw error if no reviews found', async () => {
+            findByAlbumIdMock.mockResolvedValue(null);
 
-            // Then
-            await expect(reviewService.getUserReviews(1))
-                .rejects
-                .toThrow('DB Error');
+            await expect(reviewService.getAlbumReviews('999')).rejects.toThrow('no Reviews found for 999');
         });
     });
 
     describe('createReview', () => {
         test('should create review with valid input', async () => {
-            // Given
             createReviewMock.mockResolvedValue(mockReview);
 
-            // When
-            const result = await reviewService.createReview(mockReviewInput);
-
-            // Then
-            expect(createReviewMock).toHaveBeenCalledWith(mockReviewInput);
-            expect(result).toEqual(mockReview);
+            await expect(reviewService.createReview(mockReviewInput)).resolves.toEqual(mockReview);
+            expect(createReviewMock).toHaveBeenCalledWith(
+                expect.any(Review),
+                mockReviewInput.authorId
+            );
         });
 
-        test('should handle creation error', async () => {
-            // Given
-            createReviewMock.mockRejectedValue(new Error('DB Error'));
+        test('should propagate validation errors', async () => {
+            const invalidInput = { ...mockReviewInput, starRating: 6 };
 
-            // Then
-            await expect(reviewService.createReview(mockReviewInput))
-                .rejects
-                .toThrow('DB Error');
+            await expect(reviewService.createReview(invalidInput))
+                .rejects.toThrow('starRating should be between 0 and 5 inclusively');
+        });
+    });
+
+    describe('editReview', () => {
+        test('should edit review when user is author', async () => {
+            findByIdMock.mockResolvedValue(mockReview);
+            editReviewMock.mockResolvedValue(mockReview);
+
+            await expect(
+                reviewService.editReview(mockReviewInput, 1, 'testUser', 'user' as Role)
+            ).resolves.toEqual(mockReview);
+        });
+
+        test('should edit review when user is admin', async () => {
+            findByIdMock.mockResolvedValue(mockReview);
+            editReviewMock.mockResolvedValue(mockReview);
+
+            await expect(
+                reviewService.editReview(mockReviewInput, 1, 'adminUser', 'admin' as Role)
+            ).resolves.toEqual(mockReview);
+        });
+
+        test('should throw error when unauthorized user tries to edit', async () => {
+            findByIdMock.mockResolvedValue(mockReview);
+
+            await expect(
+                reviewService.editReview(mockReviewInput, 1, 'otherUser', 'user' as Role)
+            ).rejects.toThrow('you are not authorized to access this resource');
+        });
+
+        test('should throw error when review does not exist', async () => {
+            findByIdMock.mockResolvedValue(null);
+
+            await expect(
+                reviewService.editReview(mockReviewInput, 999, 'testUser', 'user' as Role)
+            ).rejects.toThrow("List Doesn't exist");
         });
     });
 
     describe('likeReview', () => {
-        test('should update review likes', async () => {
-            // Given
-            const newLikes = [1, 2, 3];
+        test('should like review when it exists', async () => {
             findByIdMock.mockResolvedValue(mockReview);
+            likeReviewMock.mockResolvedValue(mockReview);
 
-            const updatedReview = new Review({
-                id: mockReview.getId(),
-                author: mockReview.getAuthor(),
-                title: mockReview.getTitle(),
-                body: mockReview.getDescription(),
-                starRating: mockReview.getStarRating(),
-                albumId: mockReview.getAlbum(),
-                createdAt: mockReview.getCreatedAt(),
-                comments: mockReview.getComments(),
-                likes: newLikes
-            });
-            likeReviewMock.mockResolvedValue(updatedReview);
-
-            // When
-            const result = await reviewService.likeReview(1, newLikes);
-
-            // Then
-            expect(findByIdMock).toHaveBeenCalledWith(1);
-            expect(likeReviewMock).toHaveBeenCalledWith(1, newLikes);
-            expect(result.getLikes()).toEqual(newLikes);
+            await expect(reviewService.likeReview(1, 'testUser')).resolves.toEqual(mockReview);
+            expect(likeReviewMock).toHaveBeenCalledWith(1, 'testUser');
         });
 
-        test('should throw error if review does not exist', async () => {
-            // Given
+        test('should throw error when review does not exist', async () => {
             findByIdMock.mockResolvedValue(null);
 
-            // Then
-            await expect(reviewService.likeReview(999, [1]))
-                .rejects
-                .toThrow('Review Does not Exist');
+            await expect(reviewService.likeReview(999, 'testUser'))
+                .rejects.toThrow('Review Does not Exist');
+        });
+    });
+
+    describe('unlikeReview', () => {
+        test('should unlike review when it exists', async () => {
+            findByIdMock.mockResolvedValue(mockReview);
+            unlikeReviewMock.mockResolvedValue(mockReview);
+
+            await expect(reviewService.unlikeReview(1, 'testUser')).resolves.toEqual(mockReview);
+            expect(unlikeReviewMock).toHaveBeenCalledWith(1, 'testUser');
+        });
+
+        test('should throw error when review does not exist', async () => {
+            findByIdMock.mockResolvedValue(null);
+
+            await expect(reviewService.unlikeReview(999, 'testUser'))
+                .rejects.toThrow('Review Does not Exist');
         });
     });
 
     describe('deleteReview', () => {
         test('should delete review', async () => {
-            // Given
             deleteReviewMock.mockResolvedValue(undefined);
 
-            // When
-            await reviewService.deleteReview(1);
-
-            // Then
+            await expect(reviewService.deleteReview(1)).resolves.not.toThrow();
             expect(deleteReviewMock).toHaveBeenCalledWith(1);
         });
 
-        test('should handle deletion error', async () => {
-            // Given
+        test('should propagate deletion errors', async () => {
             deleteReviewMock.mockRejectedValue(new Error('DB Error'));
 
-            // Then
-            await expect(reviewService.deleteReview(1))
-                .rejects
-                .toThrow('DB Error');
+            await expect(reviewService.deleteReview(1)).rejects.toThrow('DB Error');
         });
     });
 });

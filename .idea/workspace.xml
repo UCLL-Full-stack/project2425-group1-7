@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="" />
+    <list default="true" id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/service/listService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/service/listService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/model/comment.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/comment.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/model/list.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/list.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/model/review.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/review.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/model/user.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/user.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/service/commentService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/commentService.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/service/listService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/listService.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/service/reviewService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/reviewService.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/test/service/userService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/userService.test.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,94 +39,101 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Jest.Review Class.Constructor and Validation.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.Review Class.Constructor and Validation.should create review instance with valid data.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.Review Class.static from method.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.Review Class.static from method.should create Review from Prisma data.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.Review Service.likeReview.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.User Service.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.User Service.registerUser.should throw error if email is empty.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.User Service.registerUser.should throw error if user with email already exists.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.albumCard.test.tsx.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.comment.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.commentCard.test.tsx.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.commentService.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.list.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.listService.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.review.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.reviewService.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.user.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.userService.test.ts.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7/front-end/node_modules/jest&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Jest.Review Class.Constructor and Validation.executor": "Run",
+    "Jest.Review Class.Constructor and Validation.should create review instance with valid data.executor": "Run",
+    "Jest.Review Class.static from method.executor": "Run",
+    "Jest.Review Class.static from method.should create Review from Prisma data.executor": "Run",
+    "Jest.Review Service.likeReview.executor": "Run",
+    "Jest.User Service.blockUser.executor": "Run",
+    "Jest.User Service.blockUser.should toggle user block status when admin requests.executor": "Run",
+    "Jest.User Service.executor": "Run",
+    "Jest.User Service.promoteUser.executor": "Run",
+    "Jest.User Service.registerUser.executor": "Run",
+    "Jest.User Service.registerUser.should throw error if email is empty.executor": "Run",
+    "Jest.User Service.registerUser.should throw error if user exists.executor": "Run",
+    "Jest.User Service.registerUser.should throw error if user with email already exists.executor": "Run",
+    "Jest.User Service.registerUser.should throw error when email is already taken.executor": "Run",
+    "Jest.User Service.registerUser.should throw error when password is too short.executor": "Run",
+    "Jest.albumCard.test.tsx.executor": "Run",
+    "Jest.comment.test.ts.executor": "Run",
+    "Jest.commentCard.test.tsx.executor": "Run",
+    "Jest.commentService.test.ts.executor": "Run",
+    "Jest.list.test.ts.executor": "Run",
+    "Jest.listService.test.ts.executor": "Run",
+    "Jest.review.test.ts.executor": "Run",
+    "Jest.reviewService.test.ts.executor": "Run",
+    "Jest.user.test.ts.executor": "Run",
+    "Jest.userService.test.ts.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "testing",
+    "last_opened_file_path": "C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7/back-end/node_modules/jest",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "C:\\Users\\sdezd\\Desktop\\DOC\\UCLL\\2ND YEAR\\Full-Stack\\PROJECT\\project2425-group1-7\\back-end\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager">
-    <configuration name="Review Class.Constructor and Validation" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+}]]></component>
+  <component name="RunManager" selected="Jest.User Service.registerUser.should throw error when email is already taken">
+    <configuration name="User Service.blockUser" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
       <working-dir value="$PROJECT_DIR$/back-end" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
       <test-names>
-        <test-name value="Review Class" />
-        <test-name value="Constructor and Validation" />
+        <test-name value="User Service" />
+        <test-name value="blockUser" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="Review Class.Constructor and Validation.should create review instance with valid data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="User Service.blockUser.should toggle user block status when admin requests" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
       <working-dir value="$PROJECT_DIR$/back-end" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
       <test-names>
-        <test-name value="Review Class" />
-        <test-name value="Constructor and Validation" />
-        <test-name value="should create review instance with valid data" />
+        <test-name value="User Service" />
+        <test-name value="blockUser" />
+        <test-name value="should toggle user block status when admin requests" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="Review Class.static from method" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="User Service.promoteUser" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
       <working-dir value="$PROJECT_DIR$/back-end" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
       <test-names>
-        <test-name value="Review Class" />
-        <test-name value="static from method" />
+        <test-name value="User Service" />
+        <test-name value="promoteUser" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="Review Class.static from method.should create Review from Prisma data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="User Service.registerUser" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
       <working-dir value="$PROJECT_DIR$/back-end" />
       <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/back-end/test/model/review.test.ts" />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/back-end/test/service/userService.test.ts" />
       <test-names>
-        <test-name value="Review Class" />
-        <test-name value="static from method" />
-        <test-name value="should create Review from Prisma data" />
+        <test-name value="User Service" />
+        <test-name value="registerUser" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="User Service.registerUser.should throw error if user with email already exists" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="User Service.registerUser.should throw error when email is already taken" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/back-end/node_modules/jest" />
       <working-dir value="$PROJECT_DIR$/back-end" />
@@ -125,7 +143,7 @@
       <test-names>
         <test-name value="User Service" />
         <test-name value="registerUser" />
-        <test-name value="should throw error if user with email already exists" />
+        <test-name value="should throw error when email is already taken" />
       </test-names>
       <method v="2" />
     </configuration>
@@ -171,11 +189,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.Review Class.static from method.should create Review from Prisma data" />
-        <item itemvalue="Jest.Review Class.static from method" />
-        <item itemvalue="Jest.Review Class.Constructor and Validation" />
-        <item itemvalue="Jest.Review Class.Constructor and Validation.should create review instance with valid data" />
-        <item itemvalue="Jest.User Service.registerUser.should throw error if user with email already exists" />
+        <item itemvalue="Jest.User Service.registerUser.should throw error when email is already taken" />
+        <item itemvalue="Jest.User Service.registerUser" />
+        <item itemvalue="Jest.User Service.blockUser" />
+        <item itemvalue="Jest.User Service.blockUser.should toggle user block status when admin requests" />
+        <item itemvalue="Jest.User Service.promoteUser" />
       </list>
     </recent_temporary>
   </component>
@@ -199,10 +217,24 @@
       <workItem from="1734437242516" duration="1387000" />
       <workItem from="1734441285103" duration="14002000" />
       <workItem from="1734468062567" duration="12727000" />
+      <workItem from="1734622153044" duration="1917000" />
+      <workItem from="1734628753096" duration="4126000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/back-end/test/service/userService.test.ts</url>
+          <line>102</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -75,7 +75,7 @@ const likeList = async (id: number, username: string): Promise<List> => {
 
 const unlikeList = async (id: number, username: string): Promise<List> => {
     try{
-        const list = listDb.getById(id);
+        const list = await listDb.getById(id);
         if(!list) throw new Error("List Doesn't exist");
     }catch(e){
         throw e;

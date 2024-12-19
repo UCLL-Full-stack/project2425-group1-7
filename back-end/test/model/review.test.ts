@@ -1,24 +1,18 @@
 import { Review } from '../../model/review';
-import { User } from '../../model/user';
 import { Comment } from '../../model/comment';
-import { UserInfo } from '../../types';
+import { Role, UserInfo } from '../../types';
 
 describe('Review Class', () => {
-
-    const mockUser = new User({
-        id: 1,
-        createdAt: new Date(),
-        email: 'test@example.com',
-        username: 'testuser',
-        password: 'password12345',
-        lists: [],
-        reviews: []
-    });
-
     const mockUserInfo: UserInfo = {
         id: 1,
-        email: 'test@example.com',
-        username: 'testuser'
+        createdAt: new Date(),
+        username: 'testuser',
+        role: 'user' as Role,
+        isBlocked: false,
+        lists: [],
+        reviews: [],
+        following: [],
+        followedBy: []
     };
 
     const mockComment = new Comment({
@@ -41,165 +35,138 @@ describe('Review Class', () => {
         likes: [1, 2]
     };
 
-    let review: Review;
-    let identicalReview: Review;
-
-    beforeEach(() => {
-        review = new Review(validReviewData);
-        identicalReview = new Review(validReviewData);
-    });
-
     describe('Constructor and Validation', () => {
         test('should create review instance with valid data', () => {
-            expect(review.getId()).toBe(1);
+            const createValidReview = () => new Review(validReviewData);
+            const review = createValidReview();
+
+            expect(review.getId()).toBe(validReviewData.id);
             expect(review.getAuthor()).toEqual(mockUserInfo);
-            expect(review.getTitle()).toBe('Great Album');
-            expect(review.getDescription()).toBe('This album is amazing!');
-            expect(review.getStarRating()).toBe(5);
-            expect(review.getAlbum()).toBe('123');
-            expect(review.getComments()).toEqual([mockComment]);
-            expect(review.getLikes()).toEqual([1, 2]);
-            expect(review.getCreatedAt()).toBeInstanceOf(Date);
+            expect(review.getTitle()).toBe(validReviewData.title);
+            expect(review.getBody()).toBe(validReviewData.body);
+            expect(review.getDescription()).toBe(validReviewData.body);
+            expect(review.getStarRating()).toBe(validReviewData.starRating);
+            expect(review.getAlbum()).toBe(validReviewData.albumId);
+            expect(review.getComments()).toEqual(validReviewData.comments);
+            expect(review.getLikes()).toEqual(validReviewData.likes);
+            expect(review.getCreatedAt()).toBe(validReviewData.createdAt);
         });
 
         test('should throw error for empty title', () => {
-            expect(() => {
-                new Review({
-                    ...validReviewData,
-                    title: ''
-                });
-            }).toThrow('title and body cannot be empty');
+            const createInvalidReview = () => new Review({
+                ...validReviewData,
+                title: ''
+            });
+
+            expect(createInvalidReview).toThrowError('title and body cannot be empty');
         });
 
         test('should throw error for empty body', () => {
-            expect(() => {
-                new Review({
-                    ...validReviewData,
-                    body: ''
-                });
-            }).toThrow('title and body cannot be empty');
+            const createInvalidReview = () => new Review({
+                ...validReviewData,
+                body: ''
+            });
+
+            expect(createInvalidReview).toThrowError('title and body cannot be empty');
         });
 
         test('should throw error for empty albumId', () => {
-            expect(() => {
-                new Review({
-                    ...validReviewData,
-                    albumId: ''
-                });
-            }).toThrow('review need an albumId');
+            const createInvalidReview = () => new Review({
+                ...validReviewData,
+                albumId: ''
+            });
+
+            expect(createInvalidReview).toThrowError('review need an albumId');
         });
 
         test('should throw error for star rating below 0', () => {
-            expect(() => {
-                new Review({
-                    ...validReviewData,
-                    starRating: -1
-                });
-            }).toThrow('starRating should be between 0 and 5 inclusively');
+            const createInvalidReview = () => new Review({
+                ...validReviewData,
+                starRating: -1
+            });
+
+            expect(createInvalidReview).toThrowError('starRating should be between 0 and 5 inclusively');
         });
 
         test('should throw error for star rating above 5', () => {
-            expect(() => {
-                new Review({
-                    ...validReviewData,
-                    starRating: 6
-                });
-            }).toThrow('starRating should be between 0 and 5 inclusively');
-        });
-    });
+            const createInvalidReview = () => new Review({
+                ...validReviewData,
+                starRating: 6
+            });
 
-    describe('Getters', () => {
-        test('should get id', () => {
-            expect(review.getId()).toBe(1);
-        });
-
-        test('should get author', () => {
-            expect(review.getAuthor()).toEqual(mockUserInfo);
-        });
-
-        test('should get title', () => {
-            expect(review.getTitle()).toBe('Great Album');
-        });
-
-        test('should get description (body)', () => {
-            expect(review.getDescription()).toBe('This album is amazing!');
-        });
-
-        test('should get star rating', () => {
-            expect(review.getStarRating()).toBe(5);
-        });
-
-        test('should get album id', () => {
-            expect(review.getAlbum()).toBe('123');
-        });
-
-        test('should get comments', () => {
-            expect(review.getComments()).toEqual([mockComment]);
-        });
-
-        test('should get likes', () => {
-            expect(review.getLikes()).toEqual([1, 2]);
-        });
-
-        test('should get created date', () => {
-            expect(review.getCreatedAt()).toBeInstanceOf(Date);
+            expect(createInvalidReview).toThrowError('starRating should be between 0 and 5 inclusively');
         });
     });
 
     describe('Setters', () => {
         test('should set valid star rating', () => {
-            review.setStarRating(3);
+            const review = new Review(validReviewData);
+            const setValidRating = () => review.setStarRating(3);
+
+            setValidRating();
             expect(review.getStarRating()).toBe(3);
         });
 
         test('should throw error when setting invalid star rating below 0', () => {
-            expect(() => {
-                review.setStarRating(-1);
-            }).toThrow('starRating should be between 0 and 5 inclusively');
+            const review = new Review(validReviewData);
+            const setInvalidRating = () => review.setStarRating(-1);
+
+            expect(setInvalidRating).toThrowError('starRating should be between 0 and 5 inclusively');
         });
 
         test('should throw error when setting invalid star rating above 5', () => {
-            expect(() => {
-                review.setStarRating(6);
-            }).toThrow('starRating should be between 0 and 5 inclusively');
+            const review = new Review(validReviewData);
+            const setInvalidRating = () => review.setStarRating(6);
+
+            expect(setInvalidRating).toThrowError('starRating should be between 0 and 5 inclusively');
         });
     });
 
     describe('equals method', () => {
         test('should return true for identical reviews', () => {
-            expect(review.equals(identicalReview)).toBeTruthy();
+            const review1 = new Review(validReviewData);
+            const review2 = new Review(validReviewData);
+
+            expect(review1.equals(review2)).toBeTruthy();
         });
 
         test('should return false for reviews with different titles', () => {
-            const differentReview = new Review({
+            const review1 = new Review(validReviewData);
+            const review2 = new Review({
                 ...validReviewData,
                 title: 'Different Title'
             });
-            expect(review.equals(differentReview)).toBeFalsy();
+
+            expect(review1.equals(review2)).toBeFalsy();
         });
 
         test('should return false for reviews with different bodies', () => {
-            const differentReview = new Review({
+            const review1 = new Review(validReviewData);
+            const review2 = new Review({
                 ...validReviewData,
                 body: 'Different body'
             });
-            expect(review.equals(differentReview)).toBeFalsy();
+
+            expect(review1.equals(review2)).toBeFalsy();
         });
 
-        test('should return false for reviews with different ratings', () => {
-            const differentReview = new Review({
+        test('should return false for reviews with different star ratings', () => {
+            const review1 = new Review(validReviewData);
+            const review2 = new Review({
                 ...validReviewData,
                 starRating: 3
             });
-            expect(review.equals(differentReview)).toBeFalsy();
+
+            expect(review1.equals(review2)).toBeFalsy();
         });
     });
 
     describe('static from method', () => {
         test('should create Review from Prisma data', () => {
+            const createdAt = new Date();
             const prismaData = {
                 id: 1,
-                createdAt: new Date(),
+                createdAt: createdAt,
                 title: 'Great Album',
                 body: 'This album is amazing!',
                 starRating: 5,
@@ -207,53 +174,75 @@ describe('Review Class', () => {
                 authorId: 1,
                 author: {
                     id: 1,
-                    createdAt: new Date(),
+                    createdAt: createdAt,
                     email: 'test@example.com',
                     username: 'testuser',
-                    password: 'password12345'
+                    password: 'password12345',
+                    role: 'user',
+                    isBlocked: false,
+                    lists: [],
+                    reviews: [],
+                    following: [],
+                    followedBy: []
                 },
                 comments: [{
                     id: 1,
-                    createdAt: new Date(),
+                    createdAt: createdAt,
                     body: 'Test comment',
                     authorId: 1,
                     reviewId: 1,
                     author: {
                         id: 1,
-                        createdAt: new Date(),
+                        createdAt: createdAt,
                         email: 'test@example.com',
                         username: 'testuser',
-                        password: 'password12345'
+                        password: 'password12345',
+                        role: 'user',
+                        isBlocked: false,
+                        lists: [],
+                        reviews: [],
+                        following: [],
+                        followedBy: []
                     }
                 }],
                 likes: [{
                     id: 2,
-                    createdAt: new Date(),
+                    createdAt: createdAt,
                     email: 'liker@example.com',
                     username: 'liker',
-                    password: 'password12345'
+                    password: 'password12345',
+                    role: 'user',
+                    isBlocked: false,
+                    lists: [],
+                    reviews: [],
+                    following: [],
+                    followedBy: []
                 }]
             };
 
             const reviewFromPrisma = Review.from(prismaData);
+
             expect(reviewFromPrisma).toBeInstanceOf(Review);
             expect(reviewFromPrisma.getId()).toBe(prismaData.id);
             expect(reviewFromPrisma.getTitle()).toBe(prismaData.title);
-            expect(reviewFromPrisma.getDescription()).toBe(prismaData.body);
+            expect(reviewFromPrisma.getBody()).toBe(prismaData.body);
             expect(reviewFromPrisma.getStarRating()).toBe(prismaData.starRating);
             expect(reviewFromPrisma.getAlbum()).toBe(prismaData.albumID);
             expect(reviewFromPrisma.getAuthor()).toEqual({
                 id: prismaData.author.id,
-                email: prismaData.author.email,
-                username: prismaData.author.username
+                username: prismaData.author.username,
+                role: prismaData.author.role as Role,
+                createdAt: prismaData.author.createdAt,
+                isBlocked: prismaData.author.isBlocked
             });
             expect(reviewFromPrisma.getLikes()).toEqual([2]);
         });
 
         test('should handle empty comments and likes in Prisma data', () => {
+            const createdAt = new Date();
             const prismaData = {
                 id: 1,
-                createdAt: new Date(),
+                createdAt: createdAt,
                 title: 'Great Album',
                 body: 'This album is amazing!',
                 starRating: 5,
@@ -261,10 +250,16 @@ describe('Review Class', () => {
                 authorId: 1,
                 author: {
                     id: 1,
-                    createdAt: new Date(),
+                    createdAt: createdAt,
                     email: 'test@example.com',
                     username: 'testuser',
-                    password: 'password12345'
+                    password: 'password12345',
+                    role: 'user',
+                    isBlocked: false,
+                    lists: [],
+                    reviews: [],
+                    following: [],
+                    followedBy: []
                 }
             };
 
