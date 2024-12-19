@@ -94,7 +94,7 @@ export class Review{
         return this.id;
     }
 
-    getUser(): UserInfo | undefined{
+    getAuthor(): UserInfo | undefined{
         return this.author;
     }
 

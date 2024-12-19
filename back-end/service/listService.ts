@@ -1,5 +1,5 @@
 import { List } from "../model/list"
-import { ListInput } from "../types";
+import { ListInput, Role } from "../types";
 import listDb from "../repository/list.db";
 
 const getLists = async (): Promise<List[]> => {
@@ -34,11 +34,11 @@ const createList = async (list: ListInput): Promise<List> => {
     }
 }
 
-const editList = async (listInput: ListInput, id: number, username: string): Promise<List> => {
+const editList = async (listInput: ListInput, id: number, username: string, role: Role): Promise<List> => {
     try{
         const list = await listDb.getById(id);
         if(!list) throw new Error("List Doesn't exist");
-        if(list.getAuthor()?.username !== username){
+        if(list.getAuthor()?.username !== username && role !== 'admin'){
             throw new Error("you are not authorized to access this resource");
         } 
     }catch(e){
@@ -57,7 +57,6 @@ const editList = async (listInput: ListInput, id: number, username: string): Pro
         throw e
     }
 }
-
 
 const likeList = async (id: number, username: string): Promise<List> => {
     try{

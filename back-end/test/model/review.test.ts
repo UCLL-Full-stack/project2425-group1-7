@@ -52,7 +52,7 @@ describe('Review Class', () => {
     describe('Constructor and Validation', () => {
         test('should create review instance with valid data', () => {
             expect(review.getId()).toBe(1);
-            expect(review.getUser()).toEqual(mockUserInfo);
+            expect(review.getAuthor()).toEqual(mockUserInfo);
             expect(review.getTitle()).toBe('Great Album');
             expect(review.getDescription()).toBe('This album is amazing!');
             expect(review.getStarRating()).toBe(5);
@@ -114,7 +114,7 @@ describe('Review Class', () => {
         });
 
         test('should get author', () => {
-            expect(review.getUser()).toEqual(mockUserInfo);
+            expect(review.getAuthor()).toEqual(mockUserInfo);
         });
 
         test('should get title', () => {
@@ -242,7 +242,7 @@ describe('Review Class', () => {
             expect(reviewFromPrisma.getDescription()).toBe(prismaData.body);
             expect(reviewFromPrisma.getStarRating()).toBe(prismaData.starRating);
             expect(reviewFromPrisma.getAlbum()).toBe(prismaData.albumID);
-            expect(reviewFromPrisma.getUser()).toEqual({
+            expect(reviewFromPrisma.getAuthor()).toEqual({
                 id: prismaData.author.id,
                 email: prismaData.author.email,
                 username: prismaData.author.username

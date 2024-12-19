@@ -48,6 +48,22 @@ const createReview = async (review: ReviewInput): Promise<Response> => {
     }); 
 };
 
+const editReview = async (review: ReviewInput, id: number): Promise<Response> => {
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${id}`,{
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.token}` 
+        },
+        body: JSON.stringify(review)
+    }); 
+}
+
+
 const likeReview = async (id: number): Promise<Response> => {
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
@@ -95,6 +111,7 @@ export default{
     getAlbumReviews,
     getReviewById,
     createReview,
+    editReview,
     likeReview,
     unlikeReview,
     deleteReview

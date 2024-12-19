@@ -9,11 +9,15 @@ import reviewService from "@/services/reviewService";
 import { User, Review } from "@/types/index";
 import { Rating } from "@mui/material";
 import Link from "next/link";
+import IconDelete from "../ui/delete";
+import IconEdit from "../ui/edit";
 
 type Props = {
     user: User,
     review: Review,
-    handleClickComment: (id: number) => void
+    handleClickComment: (id: number) => void,
+    onDelete?: ()=>void ;
+    onEdit?: ()=>void ;
 }
 
 const albumFetcher = async (albumId: string) => {
@@ -22,7 +26,7 @@ const albumFetcher = async (albumId: string) => {
     return album;
 };
 
-const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
+const ReviewDetails = ({ user, review, handleClickComment, onEdit, onDelete }: Props) => {
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);
@@ -127,6 +131,26 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
                         <p className="main-thin text-md text-bg2">{review.body}</p>
                     </div>
                 </div>
+            </div>
+            <div className="flex justify-end mb-5 gap-2">
+            {onEdit && 
+                <span className="flex justify-center">
+                    <button
+                        onClick={onEdit}
+                        className="rounded-lg z-20 px-2 sm:px-3 py-1 w-full flex justify-center sm:py-1 main-thin text-xs sm:text-sm bg-text1 text-text2 hover:text-bg2 transition-colors duration-100">
+                        <IconEdit width={25} height={25}/>
+                    </button>
+                </span>
+            }
+            {onDelete && 
+                <span className="flex justify-center">
+                    <IconDelete
+                        onClick={onDelete}
+                        className="text-bg2 hover:text-red-500 duration-100"
+                        width={30} height={30}
+                    />
+                </span>
+            }
             </div>
             <div className="flex items-start justify-end gap-2 text-xs sm:text-sm text-text2 main-font">
                 <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">

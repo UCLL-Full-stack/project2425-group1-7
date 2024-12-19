@@ -172,7 +172,7 @@ describe('Review Service', () => {
 
             const updatedReview = new Review({
                 id: mockReview.getId(),
-                author: mockReview.getUser(),
+                author: mockReview.getAuthor(),
                 title: mockReview.getTitle(),
                 body: mockReview.getDescription(),
                 starRating: mockReview.getStarRating(),
