@@ -4,6 +4,29 @@ import { compare, hash } from "bcrypt";
 import { generateJWT } from "../util/jwt";
 import { User } from "../model/user";
 
+const getAllUsers = async (role: Role): Promise<UserInfo[]> => {
+    try{
+        //admin can fetch blocked users
+        const users = (role==='admin')
+            ? await userDB.findAll():
+            await userDB.findAllFunctional();
+            
+        return users.map(u=>({
+            id: u.getId(), 
+            username: u.getUsername(), 
+            role: u.getRole(),
+            isBlocked: u.getIsBlocked(),
+            createdAt: u.getCreatedAt(),
+            reviews: u.getReviews(), 
+            lists: u.getLists(), 
+            followedBy: u.getFollowers(),
+            following: u.getFollowing(),
+        }));
+    }catch(e){
+        throw e;
+    }
+}
+
 const registerUser = async (u: UserInput): Promise<UserInfo> => {
     try{
         const userExists =  await userDB.findByEmail(u.email);
@@ -136,6 +159,7 @@ const blockUser = async (id: number, role: Role): Promise<UserInfo> => {
 
 export default {
     registerUser,
+    getAllUsers,
     loginUser,
     getById,
     followUser,

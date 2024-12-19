@@ -96,7 +96,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album
                     />
                 </label>
                 {!album && (
-                    <AlbumSearch albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
+                    <AlbumSearch label="albums" albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
                 )}
                 {reviewAlbum && !album && (
                     <>

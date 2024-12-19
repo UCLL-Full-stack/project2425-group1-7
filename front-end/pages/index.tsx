@@ -137,17 +137,6 @@ const Home = ({ lists, reviews, albums }: Props) => {
     );
 };
 
-const getAlbumsByFrequency = (albums: string[]): string[] => {
-    const frequencyMap: Record<string, number> = {};
-    albums.forEach(item=>{
-        frequencyMap[item] = (frequencyMap[item] || 0) + 1;
-    });
-
-    const sorted = Object.keys(frequencyMap)
-                    .sort((a,b) => frequencyMap[b] - frequencyMap[a])
-    return sorted;
-};
-
 export const getServerSideProps = async () => {
     try{
         let response = await reviewService.getAllReviews();
@@ -166,7 +155,7 @@ export const getServerSideProps = async () => {
 
         const albumIds: string[] = [];
         reviews.map(r=>albumIds.push(r.albumId));
-        const sortedAlbumIds = getAlbumsByFrequency(albumIds);
+        const sortedAlbumIds = albumService.getAlbumsByFrequency(albumIds);
 
         const albumDetails = sortedAlbumIds.map(id => id.split('_'));
         const albums = await Promise.all(

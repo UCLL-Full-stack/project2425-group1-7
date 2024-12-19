@@ -1,21 +1,29 @@
 import { Album } from "@/types/index";
+import { Input } from "@mui/material";
 
 type Props={
     albums: Album[];
     query: string;
     setQuery: (query:string)=>void
-    onAdd: (id: string)=>void;
+    onAdd?: (id: string)=>void;
+    label: string;
+    discover?: boolean;
 }
 
-const AlbumSearch = ({albums, query, setQuery, onAdd}: Props) => {
+const AlbumSearch = ({discover, albums, query, setQuery, onAdd, label}: Props) => {
 
     return(
         <>
-            <label className="flex items-center gap-5 mb-4 text-sm text-bg2 main-font ">
-                Albums
-                {<input className="w-full p-2 bg-bg4 text-text2 rounded-md" onChange={(e) => setQuery(e.target.value)} type="search" value={query} placeholder="search"/>}
+            <label className="flex items-center justify-center gap-3 mb-4 text-sm text-text2 main-font ">
+                {label &&<p className="min-w-32">{label}</p>}
+                <Input 
+                    className="w-full p-1 text-text2 rounded-md" sx={{ input: { color: 'white' } }}  
+                    onChange={(e) => setQuery(e.target.value)} 
+                    type="search" 
+                    value={query} 
+                    placeholder="Search"/>
             </label>
-            {query && albums.length > 0 && (
+            {!discover && onAdd && query && albums.length > 0 && (
 
                 <div className="relative">
                     <div

@@ -16,6 +16,7 @@ const ReviewDetailsPage = () => {
     const router = useRouter();
     const { id } = router.query;
     const [user, setUser] = useState<User>();
+
     const { data: review } = useSWR<Review>(id ? `review/${id}` : null, () => fetchReview(Number(id)));
 
     const [comments, setComments] = useState<Comment[]>([]);
