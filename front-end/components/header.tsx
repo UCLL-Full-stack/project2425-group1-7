@@ -81,6 +81,12 @@ const Header: React.FC<Props> = ({current, user}: Props) => {
                         </Link>
                     </>
                 )}
+                    <Link 
+                        href="/about" 
+                        className={linkStyle}
+                    >
+                        About Us
+                    </Link>
                 </div>
             )}
         </div>
