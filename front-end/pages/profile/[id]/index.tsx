@@ -236,7 +236,7 @@ const Profile: React.FC = () => {
                                     <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Reviews</h1>
                                 )}
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 justify-center pt-6 sm:pt-10 gap-4 overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 p-10 justify-center pt-6 sm:pt-10 gap-4 overflow-y-auto">
                                 {user.reviews && user.reviews.length > 0 ? user.reviews.map((review) => (
                                     <ReviewCard key={review.id} review={review} onDelete={isUserProfile ? toggleDeleteReview : undefined} userId={user.id} />
                                 )) : (
@@ -262,7 +262,7 @@ const Profile: React.FC = () => {
                                     <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">Album Lists</h1>
                                 )}
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 sm:pt-10 gap-4 overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 p-10 rounded-lg sm:pt-10 gap-4 overflow-y-auto">
                                 {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
                                     <ListCard key={list.id} list={list} onDelete={isUserProfile ? toggleDeleteList : undefined} userId={user.id} />
                                 )) : (
