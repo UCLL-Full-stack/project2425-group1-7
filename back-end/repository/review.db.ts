@@ -106,6 +106,27 @@ const createReview = async (review: Review, authorId: number): Promise<Review>=>
     }
 }
 
+const editReview = async (review: Review, id: number): Promise<Review> => {
+    try{
+        const reviewPrisma = await database.review.update({
+            data:{
+                title: review.getTitle(),
+                body: review.getBody(),
+                albumID: review.getAlbum(),
+                starRating: review.getStarRating(),
+            },
+            where: {id},
+            include: {
+                author: true,
+                likes: true
+            }
+        })
+        return Review.from(reviewPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
+    } 
+}
+
 const unlikeReview = async (id:number, username: string): Promise<Review> => {
     try{
         const reviewPrisma = await database.review.update({
@@ -173,6 +194,7 @@ export default{
     findById,
     findUserReviews,
     createReview,
+    editReview,
     deleteReview,
     likeReview,
     unlikeReview,

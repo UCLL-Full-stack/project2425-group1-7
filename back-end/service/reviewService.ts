@@ -44,6 +44,31 @@ const createReview = async (newReview: ReviewInput): Promise<Review> => {
     }
 };
 
+const editReview = async (reviewInput: ReviewInput, id: number, username: string): Promise<Review> => {
+    try{
+        const review = await reviewDb.findById(id);
+        if(!review) throw new Error("List Doesn't exist");
+        if(review.getAuthor()?.username !== username){
+            throw new Error("you are not authorized to access this resource");
+        } 
+    }catch(e){
+        throw e;
+    }
+
+    const review = new Review({
+        title: reviewInput.title,
+        body: reviewInput.body,
+        albumId: reviewInput.albumId,
+        starRating: reviewInput.starRating,
+    });
+
+    try{
+        return await reviewDb.editReview(review, id);
+    }catch(e){
+        throw e
+    }
+}
+
 const unlikeReview = async (id: number, username: string): Promise<Review> => {
     const review = await reviewDb.findById(id);
     if(!review){
@@ -83,6 +108,7 @@ export default{
     getAlbumReviews,
     getReviewById,
     createReview,
+    editReview,
     deleteReview,
     likeReview,
     unlikeReview

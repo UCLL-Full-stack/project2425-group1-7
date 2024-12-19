@@ -95,7 +95,7 @@ const AlbumOverviewPage = () => {
                     onClose={toggleReviewModal} 
                     onSave={(newReview: ReviewInput) => handleCreateReview(newReview)} 
                     authorId={user.id}
-                    album={album}
+                    givenAlbum={album}
                 />
             )}
         </>

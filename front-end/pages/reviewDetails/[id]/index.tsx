@@ -6,22 +6,24 @@ import ConfirmModal from "@/components/ui/DeleteModal";
 import IconDisc from "@/components/ui/loading";
 import commentService from "@/services/commentService";
 import reviewService from "@/services/reviewService";
-import { Review, User, Comment } from "@/types/index";
+import { Review, User, Comment, ReviewInput } from "@/types/index";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import useSWR from "swr";
+import ReviewModal from "@/components/reviews/createReviewModal";
 
 const ReviewDetailsPage = () => {
     const router = useRouter();
     const { id } = router.query;
     const [user, setUser] = useState<User>();
 
-    const { data: review, error: reviewError } = useSWR<Review>(id ? `review/${id}` : null, () => fetchReview(Number(id)));
+    const { data: review, error: reviewError, mutate } = useSWR<Review>(id ? `review/${id}` : null, () => fetchReview(Number(id)));
 
     const [comments, setComments] = useState<Comment[]>([]);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [selectedComment, setSelectedComment] = useState<number>(-1);
+    const [editModal, setEditModal] = useState<boolean>(false);
+    const [selectedId, setSelectedId] = useState<number>(-1);
     const [displayComments, setDisplayComments] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
 
@@ -72,22 +74,49 @@ const ReviewDetailsPage = () => {
     };
 
     const handleDeleteComment = async () => {
-        toggleDeleteComment();
+        toggleDelete();
         if (!review) return;
-        const response = await commentService.deleteComment(selectedComment);
+        const response = await commentService.deleteComment(selectedId);
         if (!response.ok) {
             setError("Error deleting comment");
         }
 
-        setComments(comments.filter((c) => c.id !== selectedComment));
-        setSelectedComment(-1);
+        setComments(comments.filter((c) => c.id !== selectedId));
+        setSelectedId(-1);
     };
 
-    const toggleDeleteComment = (id?: number) => {
-        setSelectedComment(id??-1);
+    const handleDeleteReview = async ()=>{
+        toggleDelete();
+        if(!review) return;
+        const response = await reviewService.deleteReview(review.id);
+        if(!response){
+            setError("error deleting list");
+        }
+        router.back();
+    };
+
+    const handleEdit = async (reviewInput: ReviewInput)=>{
+        toggleEdit();
+        if(!review) return;
+        const response = await reviewService.editReview(reviewInput, review.id);
+        if(!response){
+            setError("error deleting list");
+        }
+        mutate();
+    };
+
+
+    const toggleDelete = () => {
+        if(!review)return;
+        setSelectedId(review.id);
         setDeleteModal(!deleteModal);
     };
 
+    const toggleEdit = () => {
+        setEditModal(!editModal);
+    };
+
+    const isUserReview = review?.author.id === user?.id;
     const isLoading = !review && !reviewError;
 
     return (
@@ -108,6 +137,8 @@ const ReviewDetailsPage = () => {
                                 user={user}
                                 review={review}
                                 handleClickComment={handleClickComment}
+                                onDelete={isUserReview||user.role==='admin'?toggleDelete:undefined}
+                                onEdit={isUserReview?toggleEdit:undefined}
                             />
                             {displayComments && (
                                 <div className="bg-text1 rounded-lg max-w-4xl mx-auto mt-4 shadow-lg shadow-text1">
@@ -123,7 +154,7 @@ const ReviewDetailsPage = () => {
                                                     user.role === "admin" ||
                                                     user.role === "moderator" ||
                                                     user.id === comment.author.id
-                                                        ? toggleDeleteComment
+                                                        ? toggleDelete
                                                         : undefined
                                                 }
                                             />
@@ -133,11 +164,20 @@ const ReviewDetailsPage = () => {
                             )}
                             {deleteModal && (
                                 <ConfirmModal
-                                    id={selectedComment}
-                                    handler={handleDeleteComment}
-                                    onClose={toggleDeleteComment}
+                                    id={selectedId}
+                                    handler={selectedId === review.id?handleDeleteReview:handleDeleteComment}
+                                    onClose={toggleDelete}
                                     isDeleting={true}
-                                    message={`Delete Comment?`}
+                                    message={`${selectedId === review.id?"Delete Review":"Delete Comment"}`}
+                                />
+                            )}
+                            {editModal && (
+                                <ReviewModal
+                                    isOpen={editModal} 
+                                    onClose={toggleEdit}
+                                    onSave={handleEdit}
+                                    authorId={user.id}
+                                    review={review}
                                 />
                             )}
                         </>

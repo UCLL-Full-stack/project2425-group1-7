@@ -11,10 +11,11 @@ import React from "react";
 type Props = {
     review: Review;
     onDelete?: (id:number)=>void;
+    onEdit?: (review: Review)=>void;
     userId?: number;
 }
 
-const ReviewCard: React.FC<Props> = ({review, onDelete, userId}: Props) => {
+const ReviewCard: React.FC<Props> = ({review, onDelete, onEdit, userId}: Props) => {
 
     const router = useRouter();
     const formattedDate = new Date(review.createdAt).toLocaleDateString();
@@ -39,6 +40,13 @@ const ReviewCard: React.FC<Props> = ({review, onDelete, userId}: Props) => {
         
         e.stopPropagation(); 
         onDelete(review.id);
+    }
+
+    const handleEdit = (e)=>{
+        if(!onEdit) return;
+        
+        e.stopPropagation(); 
+        onEdit(review);
     }
 
 
@@ -80,9 +88,10 @@ const ReviewCard: React.FC<Props> = ({review, onDelete, userId}: Props) => {
                     </span>
                 </div>
                 <div className="flex gap-2">
-                {onDelete &&
+                {onEdit &&
                     <button
-                        className="rounded-lg px-2 sm:px-3 py-1 w-full flex justify-center sm:py-1 main-thin text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-text2 transition-colors duration-100">
+                        onClick={handleEdit}
+                        className="rounded-lg z-50 px-2 sm:px-3 py-1 w-full flex justify-center sm:py-1 main-thin text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-text2 transition-colors duration-100">
                         <IconEdit width={25} height={25}/>
                     </button>
                 }

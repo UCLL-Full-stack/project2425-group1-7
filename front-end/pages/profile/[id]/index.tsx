@@ -8,7 +8,7 @@ import IconAdd from "@/components/ui/add";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { List, ListInput, ReviewInput, User } from "@/types/index";
+import { List, ListInput, Review, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -32,7 +32,9 @@ const Profile: React.FC = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
     const [isDeleteReviewOpen, setIsDeleteReviewOpen] = useState<boolean>(false);
+    const [isEditReviewOpen, setIsEditReviewOpen] = useState<boolean>(false);
     const [editingList, setEditingList] = useState<List | null>(null);
+    const [editingReview, setEditingReview] = useState<Review | null>(null);
     const [selectedId, setSelectedId] = useState<number>(0);
     const [sessionUser, setSessionUser] = useState<User>();
 
@@ -86,8 +88,17 @@ const Profile: React.FC = () => {
     const handleCreateReview = async (review: ReviewInput) => {
         await reviewService.createReview(review);
         mutateUser();
-        toggleReviewModal();
+        toggleCreateReviewModal();
     }
+
+    const handleEditReview = async (review: ReviewInput) => {
+        if(!editingReview)return;
+        const response = await reviewService.editReview(review, editingReview?.id);
+        if(response.ok){
+            mutateUser();
+        }
+        toggleEditReviewModal(null);
+    };
 
     const handlePromoteUser = async () => {
         if (!user) return;
@@ -144,7 +155,11 @@ const Profile: React.FC = () => {
         setEditingList(list??null);
         setIsListModalOpen(!isListModalOpen);
     }
-    const toggleReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
+    const toggleCreateReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
+    const toggleEditReviewModal = (review: Review | null) => {
+        setEditingReview(review??null);
+        setIsReviewModalOpen(!isReviewModalOpen);
+    }
     const toggleDeleteList = (id?: number) => {
         setSelectedId(id ?? -1);
         setIsDeleteListOpen(!isDeleteListOpen);
@@ -247,7 +262,7 @@ const Profile: React.FC = () => {
                                     <>
                                         <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Reviews</h1>
                                         <button
-                                            onClick={toggleReviewModal}
+                                            onClick={toggleCreateReviewModal}
                                             type="button"
                                             className="mt-2 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
                                         >
@@ -260,7 +275,13 @@ const Profile: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 p-10 justify-center pt-6 sm:pt-10 gap-4 overflow-y-auto">
                                 {user.reviews && user.reviews.length > 0 ? user.reviews.map((review) => (
-                                    <ReviewCard key={review.id} review={review} onDelete={isUserProfile ? toggleDeleteReview : undefined} userId={user.id} />
+                                    <ReviewCard 
+                                        key={review.id} 
+                                        review={review} 
+                                        onEdit={isUserProfile ? toggleEditReviewModal : undefined}
+                                        onDelete={isUserProfile ? toggleDeleteReview : undefined} 
+                                        userId={user.id} 
+                                    />
                                 )) : (
                                     <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Reviews To Show</h2>
                                 )}
@@ -316,12 +337,24 @@ const Profile: React.FC = () => {
                     </>
                 )}
                 {isReviewModalOpen && user && (
-                    <ReviewModal
-                        isOpen={isReviewModalOpen}
-                        onClose={toggleReviewModal}
-                        onSave={handleCreateReview}
-                        authorId={user.id}
-                    />
+                    <>
+                        {editingReview ? (
+                            <ReviewModal
+                                isOpen={isReviewModalOpen}
+                                onClose={toggleEditReviewModal}
+                                onSave={handleEditReview}
+                                authorId={user.id}
+                                review={editingReview}
+                            />
+                        ):(
+                            <ReviewModal
+                                isOpen={isReviewModalOpen}
+                                onClose={toggleCreateReviewModal}
+                                onSave={handleCreateReview}
+                                authorId={user.id}
+                            />
+                        )}
+                    </>
                 )}
                 {isDeleteListOpen && user && (
                     <ConfirmModal

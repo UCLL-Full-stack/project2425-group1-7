@@ -58,7 +58,6 @@ const editList = async (listInput: ListInput, id: number, username: string): Pro
     }
 }
 
-
 const likeList = async (id: number, username: string): Promise<List> => {
     try{
         const list = await listDb.getById(id);

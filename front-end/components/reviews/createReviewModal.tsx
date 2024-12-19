@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Album, ReviewInput } from "@/types/index";
+import { Album, Review, ReviewInput } from "@/types/index";
 import albumService from "@/services/albumService";
 import { Rating } from "@mui/material";
 import AlbumListCard from "../album/albumListCard";
@@ -8,19 +8,21 @@ import AlbumSearch from "../album/albumSearch";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (newList: ReviewInput) => void;
+    onSave: (newReview: ReviewInput) => void;
     authorId: number,
-    album?: Album,
+    givenAlbum?: Album,
+    review?: Review,
 };
 
-const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album}) => {
+const ReviewModal = ({ review, isOpen, onClose, onSave, authorId, givenAlbum}:Props) => {
 
-    const [title, setTitle] = useState("");
-    const [body, setBody] = useState("");
+    const [title, setTitle] = useState(review?review.title:"");
+    const [body, setBody] = useState(review?review.body:"");
     const [albums, setAlbums] = useState<Album[]>([]);
+    const [album, setAlbum] = useState<Album | null>(givenAlbum??null);
     const [query, setQuery] = useState<string>('');
     const [reviewAlbum, setReviewAlbum] = useState<Album | null>(null);
-    const [starRating, setStarRating] = useState<number>(0);
+    const [starRating, setStarRating] = useState<number>(review?.starRating??0);
     const [error, setError] = useState<string>("");
 
     const fetchAlbums = async () => {
@@ -32,7 +34,18 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album
         setAlbums(albums);
     }
 
+    const fetchAlbum = async () => {
+        if(!review)return;
+        const details = review.albumId.split('_');
+        const album = await albumService.fetchAlbum(details[0], details[1]);
+        setAlbum(album);
+    }
+
     useEffect(() => {
+        if(review){
+            fetchAlbum();
+            return;   
+        }
         fetchAlbums();
     }, [query]);
 
@@ -44,7 +57,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album
         setQuery('');
     }
 
-    const handleRemoveAlbum = (album?: Album) => {
+    const handleRemoveAlbum = () => {
         setReviewAlbum(null);
     }
 
@@ -95,7 +108,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album
                         required
                     />
                 </label>
-                {!album && (
+                {!album && !review && (
                     <AlbumSearch label="albums" albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
                 )}
                 {reviewAlbum && !album && (

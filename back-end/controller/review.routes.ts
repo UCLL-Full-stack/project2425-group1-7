@@ -43,6 +43,21 @@ reviewRouter.post("/", async(req: Request, res: Response, next: NextFunction)=>{
     }
 });
 
+reviewRouter.put('/:id', async (req: Request, res: Response, next: NextFunction)=>{
+
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        const review = <ReviewInput> req.body;
+        await reviewService.editReview(review, id, username);
+        res.status(200).json(id);
+    }catch(e){
+        next(e);
+    }
+});
+
+
 reviewRouter.delete("/:id", async(req: Request, res: Response, next: NextFunction)=>{
     try{
         const id = Number(req.params["id"])
