@@ -126,7 +126,7 @@ describe('User Service', () => {
 
         test('should register new user when email is not taken', async () => {
             // Given
-            findByEmailMock.mockRejectedValue(new Error('User not found'));
+            findByEmailMock.mockResolvedValue(null);
 
             (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
 
@@ -237,6 +237,7 @@ describe('User Service', () => {
         });
 
         test('should throw error when non-admin tries to promote', async () => {
+            findByIdMock.mockResolvedValue(mockUser);
             await expect(
                 userService.promoteUser(1, 'user' as Role)
             ).rejects.toThrow('You are not authorized to access this resource');
@@ -286,6 +287,7 @@ describe('User Service', () => {
         });
 
         test('should throw error when non-admin tries to block', async () => {
+            findByIdMock.mockResolvedValue(mockUser);
             await expect(
                 userService.blockUser(1, 'user' as Role)
             ).rejects.toThrow('You are not authorized to access this resource');

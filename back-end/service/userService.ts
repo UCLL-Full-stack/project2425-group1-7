@@ -32,9 +32,7 @@ const registerUser = async (u: UserInput): Promise<UserInfo> => {
         const userExists =  await userDB.findByEmail(u.email);
         if(userExists)throw new Error(`user with Email ${u.email} already exists`);
     }catch(e){ 
-        //this is to make sure the findByEmail 
-        //method throws, which means the email 
-        //isn't used
+        throw e;
     }
 
     const user = new User({ 
@@ -59,7 +57,7 @@ const registerUser = async (u: UserInput): Promise<UserInfo> => {
 const loginUser = async ({email, password}: UserInput): Promise<AuthResponse> => {
     try{
         const u = await userDB.findByEmail(email);
-        if(!u)throw new Error(`user with Email ${email} already exists`);
+        if(!u) throw new Error(`no account is associated with ${email}`);
         if (! await compare(password, u.getPassword())) {
             throw new Error("Invalid Credentials");
         }
@@ -80,6 +78,7 @@ const loginUser = async ({email, password}: UserInput): Promise<AuthResponse> =>
 const getById = async (id: number): Promise<UserInfo> => {
     try{
         const user = await userDB.findById(id);
+        if (!user) throw new Error('user does not exist');
         return {
             id: user.getId(),
             username: user.getUsername(),
@@ -116,9 +115,10 @@ const unfollowUser = async(id: number, username: string): Promise<number> =>{
 const promoteUser = async (id: number, role: Role): Promise<UserInfo> => {
     try{
         const u = await userDB.findById(id);
-        if(
-            role !== 'admin'
-        ) throw new Error("You are not authorized to access this resource");
+        if(!u) throw new Error("user doesn't exits");
+
+        if( role !== 'admin') 
+            throw new Error("You are not authorized to access this resource");
 
         const newRole = u.getRole() == 'user'? 'moderator':'user';
         const user = await userDB.promoteById(id, newRole);
@@ -139,9 +139,9 @@ const promoteUser = async (id: number, role: Role): Promise<UserInfo> => {
 const blockUser = async (id: number, role: Role): Promise<UserInfo> => {
     try{
         const u = await userDB.findById(id);
-        if(
-            role !== 'admin'
-        ) throw new Error("You are not authorized to access this resource");
+        if(!u) throw(new Error("user doesn't exits"));
+        if( role !== 'admin') 
+            throw new Error("You are not authorized to access this resource");
 
         const user = await userDB.blockById(id, u.getIsBlocked());
         return {
