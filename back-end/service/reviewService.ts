@@ -1,6 +1,6 @@
 import { Review } from "../model/review";
 import reviewDb from "../repository/review.db"
-import { ReviewInput } from "../types";
+import { ReviewInput, Role } from "../types";
 
 const getAllReviews = async(): Promise<Review[]> => {
     try{
@@ -44,11 +44,11 @@ const createReview = async (newReview: ReviewInput): Promise<Review> => {
     }
 };
 
-const editReview = async (reviewInput: ReviewInput, id: number, username: string): Promise<Review> => {
+const editReview = async (reviewInput: ReviewInput, id: number, username: string, role: Role): Promise<Review> => {
     try{
         const review = await reviewDb.findById(id);
         if(!review) throw new Error("List Doesn't exist");
-        if(review.getAuthor()?.username !== username){
+        if(review.getAuthor()?.username !== username && role !== 'admin'){
             throw new Error("you are not authorized to access this resource");
         } 
     }catch(e){

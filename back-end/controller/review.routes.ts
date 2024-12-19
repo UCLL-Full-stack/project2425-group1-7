@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import reviewService from '../service/reviewService';
-import { ReviewInput } from '../types';
+import { ReviewInput, Role } from '../types';
 
 export const reviewRouter = express.Router();
 
@@ -46,11 +46,11 @@ reviewRouter.post("/", async(req: Request, res: Response, next: NextFunction)=>{
 reviewRouter.put('/:id', async (req: Request, res: Response, next: NextFunction)=>{
 
     try{
-        const request = req as Request & {auth: {username: string}}
-        const {username}= request.auth;
+        const request = req as Request & {auth: {username: string, role: Role}}
+        const {username, role}= request.auth;
         const id = Number(req.params['id']);
         const review = <ReviewInput> req.body;
-        await reviewService.editReview(review, id, username);
+        await reviewService.editReview(review, id, username, role);
         res.status(200).json(id);
     }catch(e){
         next(e);

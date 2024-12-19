@@ -37,7 +37,7 @@
  */
 import express, { NextFunction, Request, Response } from 'express';
 import listService from '../service/listService';
-import { ListInput } from '../types';
+import { ListInput, Role } from '../types';
 
 const listRouter = express.Router();
 
@@ -107,11 +107,11 @@ listRouter.get('/:id', async (req: Request, res: Response, next: NextFunction)=>
 listRouter.put('/:id', async (req: Request, res: Response, next: NextFunction)=>{
 
     try{
-        const request = req as Request & {auth: {username: string}}
-        const {username}= request.auth;
+        const request = req as Request & {auth: {username: string, role: Role}}
+        const {username, role}= request.auth;
         const id = Number(req.params['id']);
         const list = <ListInput> req.body;
-        await listService.editList(list, id, username);
+        await listService.editList(list, id, username, role);
         res.status(200).json(id);
     }catch(e){
         next(e);
