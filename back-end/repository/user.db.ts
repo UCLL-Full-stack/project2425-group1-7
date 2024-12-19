@@ -1,5 +1,5 @@
 import { User } from "../model/user"
-import { Role, UserInfo } from "../types";
+import { Role } from "../types";
 import database from "../util/database";
 
 const registerUser = async (user: User): Promise<User> => {
@@ -13,7 +13,7 @@ const registerUser = async (user: User): Promise<User> => {
         });
         return User.from(userPrisma);
     } catch(e){
-        throw new Error("DB Error: "+ e);
+        throw new Error("DB Error");
     }
 }
 
@@ -80,7 +80,7 @@ const findAllFunctional = async (): Promise<User[]>=>{
     }
 }
 
-const findById = async (id: number): Promise<User> => {
+const findById = async (id: number): Promise<User | null> => {
     try{
         const userPrisma = await database.user.findFirst({
             where: {id},
@@ -106,19 +106,19 @@ const findById = async (id: number): Promise<User> => {
                 followedBy: true,
             }
         });
-        if(!userPrisma) throw new Error('user does not exist');
+        if(!userPrisma) return null;
         return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");
     }
 }
 
-const findByEmail = async (email: string): Promise<User> => {
+const findByEmail = async (email: string): Promise<User | null> => {
     try{
         const userPrisma = await database.user.findUnique({
             where: {email},
         });
-        if(!userPrisma) throw new Error(`${email} is not associated to any account`);
+        if(!userPrisma) return null;
         return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");
@@ -161,7 +161,6 @@ const promoteById = async (id: number, role: Role): Promise<User> =>{
                 role: role
             }
         })
-        if(!userPrisma) throw new Error('user does not exist');
         return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");
@@ -177,7 +176,6 @@ const blockById = async (id: number, isBlocked: boolean): Promise<User> =>{
                 role: 'user'
             }
         })
-        if(!userPrisma) throw new Error('user does not exist');
         return User.from(userPrisma);
     }catch(e){
         throw new Error("DB Error");

@@ -25,7 +25,10 @@ const Signup = () => {
 
         if (!response.ok){
             const error = await response.json();
-            setError(error.message);
+            if(error.message == `user with Email ${email} already exists`)
+                setError(error.message);
+            else 
+                setError("Error creating account");
             setEmail("");
             setPassword("");
             setUsername("");
@@ -57,7 +60,7 @@ const Signup = () => {
                             className="px-8 sm:px-12 md:px-16 py-8 w-full sm:w-2/3 md:w-[30vw] lg:w-[25vw] bg-text1 rounded-t-lg">
                             <h2 className="text-3xl sm:text-4xl text-center text-text2 main-font mb-8 sm:mb-10 md:mb-12">Sign Up</h2>
                             {error && 
-                                <span className="block text-center text-red-500 mb-4 sm:mb-6">{error}</span>
+                                <span className="block text-center main-font text-red-500 mb-4 sm:mb-6">{error}</span>
                             }
                             <label className="block text-sm sm:text-base text-text2 main-font mb-4 sm:mb-6">
                                 Username 
