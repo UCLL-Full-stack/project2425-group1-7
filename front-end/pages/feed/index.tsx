@@ -1,49 +1,88 @@
 import Header from "@/components/header";
 import ListCard from "@/components/lists/listCard";
 import ReviewDetails from "@/components/reviews/reviewDetails";
-import listService from "@/services/listService";
-import reviewService from "@/services/reviewService";
-import userService from "@/services/userService";
-import { List, Review, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
+import { List, Review, User } from "@/types/index";
+import userService from "@/services/userService";
+import IconDisc from "@/components/ui/loading";
+import reviewService from "@/services/reviewService";
+import listService from "@/services/listService";
 
-type Props = {
-    lists: List[],
-    reviews: Review[]
-}
+const reviewFetcher = async () => {
+    const response = await reviewService.getAllReviews();
+    if (!response.ok) throw new Error('Failed to fetch reviews');
+    const data: Review[] = await response.json();
+    return data.filter(r => !r.author.isBlocked)
+    .sort((a, b) => 
+          (b.likes.length + b.comments.length) - (a.likes.length + a.comments.length)
+         );
+};
 
-const Feed = ({ lists, reviews }: Props) => {
+const listFetcher = async () => {
+    const response = await listService.getAllLists();
+    if (!response.ok) throw new Error('Failed to fetch lists');
+
+    const data: List[] = await response.json();
+    return data.filter(l => !l.author.isBlocked)
+    .sort((a, b) => b.likes.length - a.likes.length);
+};
+
+const Feed = () => {
     const router = useRouter();
     const [user, setUser] = useState<User>();
 
-    useEffect(() => {
-        const getUser = () => {
-            const userString = sessionStorage.getItem("LoggedInUser");
-            if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
-                const u = JSON.parse(userString);
-                setUser({
-                    id: u.id,
-                    username: u.username,
-                    isBlocked: u.isBlocked,
-                    role: u.role
-                });
-                return;
-            }
+    const { data: reviews, error: reviewsError } = useSWR<Review[]>(
+        'reviews',
+        reviewFetcher
+    );
 
-            router.push("/login");
-        };
+    const { data: lists, error: listsError } = useSWR<List[]>(
+        'lists',
+        listFetcher
+    );
 
-        getUser();
-    }, []);
+    useEffect(()=>{
+        const userString = sessionStorage.getItem("LoggedInUser");
+        if (!userString || userService.isJwtExpired(JSON.parse(userString).token)) {
+            router.push("/login")
+            return;
+        }
+        const u = JSON.parse(userString);
 
-    const handleOpenReview = (id: number)=>{
+        if(u.isBlocked){
+            router.push("/blocked");
+            return;
+        }
+
+        setUser({
+            id: u.id,
+            username: u.username,
+            isBlocked: u.isBlocked,
+            role: u.role
+        });
+    }, [router]);
+
+    const handleOpenReview = (id: number) => {
         router.push(`/reviewDetails/${id}`);
+    };
+
+    if (!user || !reviews || !lists) {
+        return (
+            <div className="flex bg-bg1 justify-center items-center h-screen">
+                <IconDisc className="text-text1 bg-bg1" height={100} width={100}/>
+            </div>
+        );
     }
 
-    if (user && user.isBlocked){
-        router.push('/blocked');
+    if (reviewsError || listsError) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-red-500">Error loading data. Please try again later.</div>
+            </div>
+        );
     }
 
     return (
@@ -53,69 +92,41 @@ const Feed = ({ lists, reviews }: Props) => {
             </Head>
             <div className="flex flex-col h-screen">
                 <Header current="feed" user={user} />
-                {user && (
-                    <>
-                        <div className="bg-bg1 p-4 border-b border-bg3 w-screen grid gap-3">
-                            <span className="text-center main-font text-text2 text-4xl">
-                                Feed
-                            </span>
-                        </div>
-                        <main className="flex-1 flex justify-evenly gap-4 bg-bg1 p-10 overflow-y-auto">
-                            <div className="flex flex-col gap-4">
-                                <span className="text-center main-font text-text2 text-4xl">
-                                    Reviews
-                                </span>
-                                {reviews.map(review=>(
-                                    <ReviewDetails 
-                                        user={user} 
-                                        review={review} 
-                                        handleClickComment={handleOpenReview}/>
-                                ))}
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <span className="text-center main-font text-text2 text-4xl">
-                                Lists
-                                </span>
-                                {lists.map(list=><ListCard list={list} userId={user.id}/>)}
-                            </div>
-                        </main>
-                    </>
-                )}
+                <div className="bg-bg1 p-4 border-b border-bg3 w-screen grid gap-3">
+                    <span className="text-center main-font text-text2 text-2xl">
+                    Feed
+                    </span>
+                </div>
+                <main className="flex-1 flex justify-evenly gap-4 bg-bg1 p-10 overflow-y-auto">
+                    <div className="flex flex-col gap-4">
+                        <span className="text-center main-font text-text2 text-4xl">
+                        Reviews
+                        </span>
+                        {reviews.map(review => (
+                            <ReviewDetails 
+                            key={review.id}
+                            user={user} 
+                            review={review} 
+                            handleClickComment={handleOpenReview}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        <span className="text-center main-font text-text2 text-4xl">
+                        Lists
+                        </span>
+                        {lists.map(list => (
+                            <ListCard 
+                            key={list.id}
+                            list={list} 
+                            userId={user.id}
+                            />
+                        ))}
+                    </div>
+                </main>
             </div>
         </>
     );
 };
 
-export const getServerSideProps = async () => {
-    try{
-        let response = await reviewService.getAllReviews();
-        if(!response.ok){
-            throw new Error("error fetching reviews");
-        }
-        const reviews: Review[] = await response.json();
-
-        response = await listService.getAllLists();
-        if(!response.ok){
-            throw new Error("error fetching lists");
-        }
-        const lists: List[] = await response.json();
-
-        reviews.sort((a, b)=>(
-            a.likes.length + a.comments.length) - 
-            (b.likes.length + b.comments.length)
-        ).reverse();
-        lists.sort((a, b)=>a.likes.length - b.likes.length).reverse();
-
-        return {props: {
-            lists: lists.filter(l=> !l.author.isBlocked), 
-            reviews: reviews.filter(r=> !r.author.isBlocked)
-        }};
-        
-    }catch(e){
-        console.log(e);
-        return {props: {lists: [], reviews: []}};
-    }
-} 
-
 export default Feed;
-

@@ -93,7 +93,7 @@ const ReviewDetailsPage = () => {
                                 handleClickComment={handleClickComment}
                             />
                             {displayComments && (
-                                <div className="bg-text1 max-w-4xl mx-auto mt-4">
+                                <div className="bg-text1 rounded-lg max-w-4xl mx-auto mt-4 shadow-lg shadow-text1">
                                     <CommentInput onSubmit={handleComment} />
                                     <div className="grid">
                                         {comments.map((comment) => (

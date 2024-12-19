@@ -20,7 +20,7 @@ const Header: React.FC<Props> = ({current, user}: Props) => {
     }
 
     return (
-        <div className="bg-text1 sm:py-3 md:py-8 sm:px-4 md:px-16 lg:px-20 md:flex sm:grid sm:gap-4 sm:justify-center md:justify-between items-center">
+        <div className="bg-text1 w-full sm:py-3 md:py-8 sm:px-4 md:px-16 lg:px-20 md:flex sm:grid sm:gap-4 sm:justify-center md:justify-between items-center">
             <div className="flex justify-center sm:text-4xl md:text-6xl sm:justify-center md:justify-start items-center yadig-italic mr-4 text-text2 hover:text-bg3 duration-100 ">
                 <Link href="/">yadig?</Link>
             </div>

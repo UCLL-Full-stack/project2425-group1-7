@@ -10,9 +10,10 @@ type Props = {
     onClose: () => void;
     onSave: (newList: ReviewInput) => void;
     authorId: number,
+    album?: Album,
 };
 
-const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId }) => {
+const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId, album}) => {
 
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
@@ -49,7 +50,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId }) => 
 
     const handleSave = () => {
 
-        if (!reviewAlbum) {
+        if (!reviewAlbum && !album) {
             setError("Choose an album to review");
             return;
         }
@@ -62,7 +63,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId }) => 
         const newReview: ReviewInput = {
             title,
             body,
-            albumId: reviewAlbum.id,
+            albumId: (reviewAlbum?reviewAlbum.id:album?.id) || '',
             authorId,
             starRating,
         };
@@ -71,7 +72,7 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId }) => 
     };
 
     return (
-        <div className={`fixed inset-0 flex px-4 items-center justify-center bg-black bg-opacity-50 transition-opacity duration-100 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`fixed inset-0 z-20 flex px-4 items-center justify-center bg-black bg-opacity-50 transition-opacity duration-100 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
             <div className={`bg-text1 p-6 rounded-lg w-full max-w-md shadow-lg transform transition-transform duration-100 ${isOpen ? 'scale-100' : 'scale-0'}`}>
                 <h2 className="text-2xl text-text2 main-font mb-4">Review an album</h2>
                 <label className="block mb-2 text-sm text-bg2 main-font">
@@ -94,19 +95,33 @@ const ReviewModal: React.FC<Props> = ({ isOpen, onClose, onSave, authorId }) => 
                         required
                     />
                 </label>
-                <AlbumSearch albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
-                {reviewAlbum && (
-                    <AlbumListCard albums={[reviewAlbum]} onRemove={handleRemoveAlbum}/>
+                {!album && (
+                    <AlbumSearch albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
                 )}
-                {reviewAlbum &&
-                    <label className="flex justify-center items-center p-2 text-sm text-text2 main-font">
-                        <Rating 
-                            onChange={(e, newValue) => setStarRating(Number(newValue))}
-                            value={starRating}
-                            size="large"
-                        />
-                    </label>
-                }
+                {reviewAlbum && !album && (
+                    <>
+                        <AlbumListCard review={true} albums={[reviewAlbum]} onRemove={handleRemoveAlbum}/>
+                        <label className="flex bg-text2 rounded-b-md justify-center items-center p-2 text-sm text-text2 main-font">
+                            <Rating 
+                                onChange={(e, newValue) => setStarRating(Number(newValue))}
+                                value={starRating}
+                                size="large"
+                            />
+                        </label>
+                    </>
+                )}
+                {album && (
+                    <>
+                        <AlbumListCard review={true} albums={[album]} onRemove={handleRemoveAlbum}/>
+                        <label className="flex bg-text2 rounded-b-md justify-center items-center p-2 text-sm text-text2 main-font">
+                            <Rating 
+                                onChange={(e, newValue) => setStarRating(Number(newValue))}
+                                value={starRating}
+                                size="large"
+                            />
+                        </label>
+                    </>
+                )}
                 {error && 
                     <div className="w-full text-center border-1 rounded-md bg-bg1 p-2">
                         <span className="text-[#d00] main-font">{error}</span>

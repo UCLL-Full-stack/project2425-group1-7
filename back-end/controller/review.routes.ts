@@ -23,6 +23,16 @@ reviewRouter.get("/:id", async(req: Request, res: Response, next: NextFunction)=
     }
 });
 
+reviewRouter.get("/album/:id", async(req: Request, res: Response, next: NextFunction)=>{
+    const id = String(req.params["id"])
+    try{
+        const reviews = await reviewService.getAlbumReviews(id);
+        res.status(200).json(reviews);
+    }catch(e){
+        next(e);
+    }
+});
+
 reviewRouter.post("/", async(req: Request, res: Response, next: NextFunction)=>{
     try{
         const reviewInput: ReviewInput = req.body;
@@ -37,7 +47,7 @@ reviewRouter.delete("/:id", async(req: Request, res: Response, next: NextFunctio
     try{
         const id = Number(req.params["id"])
         await reviewService.deleteReview(id);
-        res.status(200);
+        res.status(200).json(id);
     }catch(e){
         next(e);
     }
