@@ -34,9 +34,34 @@ const createList = async (list: ListInput): Promise<List> => {
     }
 }
 
+const editList = async (listInput: ListInput, id: number, username: string): Promise<List> => {
+    try{
+        const list = await listDb.getById(id);
+        if(!list) throw new Error("List Doesn't exist");
+        if(list.getAuthor()?.username !== username){
+            throw new Error("you are not authorized to access this resource");
+        } 
+    }catch(e){
+        throw e;
+    }
+
+    const list = new List({
+        title: listInput.title,
+        description: listInput.description,
+        albumIds: listInput.albums,
+    });
+
+    try{
+        return await listDb.editList(list, id);
+    }catch(e){
+        throw e
+    }
+}
+
+
 const likeList = async (id: number, username: string): Promise<List> => {
     try{
-        const list = listDb.getById(id);
+        const list = await listDb.getById(id);
         if(!list) throw new Error("List Doesn't exist");
     }catch(e){
         throw e;
@@ -76,6 +101,7 @@ export default {
     getLists, 
     getListById,
     createList,
+    editList,
     likeList,
     unlikeList,
     deleteList

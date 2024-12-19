@@ -34,6 +34,21 @@ const createList = async (list: ListInput): Promise<Response> => {
     }); 
 }
 
+const editList = async(list: ListInput, id: number): Promise<Response> =>{
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/${id}`,{
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.token}` 
+        },
+        body: JSON.stringify(list)
+    }); 
+}
+
 const likeList = async (id: number): Promise<Response> => {
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
@@ -80,6 +95,7 @@ export default {
     getAllLists,
     getListById,
     createList,
+    editList,
     likeList,
     unlikeList,
     deleteList

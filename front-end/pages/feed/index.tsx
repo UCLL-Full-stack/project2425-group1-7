@@ -14,19 +14,19 @@ import listService from "@/services/listService";
 const reviewFetcher = async () => {
     const response = await reviewService.getAllReviews();
     if (!response.ok) throw new Error('Failed to fetch reviews');
-    const data: Review[] = await response.json();
-    return data.filter(r => !r.author.isBlocked)
+    const fetchedReview: Review[] = await response.json();
+    return fetchedReview.filter(r => !r.author.isBlocked)
     .sort((a, b) => 
           (b.likes.length + b.comments.length) - (a.likes.length + a.comments.length)
-         );
+    );
 };
 
 const listFetcher = async () => {
     const response = await listService.getAllLists();
     if (!response.ok) throw new Error('Failed to fetch lists');
 
-    const data: List[] = await response.json();
-    return data.filter(l => !l.author.isBlocked)
+    const fetchedList: List[] = await response.json();
+    return fetchedList.filter(l => !l.author.isBlocked)
     .sort((a, b) => b.likes.length - a.likes.length);
 };
 

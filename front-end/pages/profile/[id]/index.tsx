@@ -8,7 +8,7 @@ import IconAdd from "@/components/ui/add";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { ListInput, ReviewInput, User } from "@/types/index";
+import { List, ListInput, ReviewInput, User } from "@/types/index";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -32,6 +32,7 @@ const Profile: React.FC = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
     const [isDeleteListOpen, setIsDeleteListOpen] = useState<boolean>(false);
     const [isDeleteReviewOpen, setIsDeleteReviewOpen] = useState<boolean>(false);
+    const [editingList, setEditingList] = useState<List | null>(null);
     const [selectedId, setSelectedId] = useState<number>(0);
     const [sessionUser, setSessionUser] = useState<User>();
 
@@ -42,6 +43,7 @@ const Profile: React.FC = () => {
 
     const isUserProfile = sessionUser?.id === Number(id);
     const isFollowing = user?.followedBy?.includes(sessionUser?.id ?? -1);
+    const isFollower = user?.following?.includes(sessionUser?.id?? -1);
 
     useEffect(() => {
         const userString = sessionStorage.getItem("LoggedInUser");
@@ -65,10 +67,21 @@ const Profile: React.FC = () => {
     }
 
     const handleCreateList = async (list: ListInput) => {
-        await listService.createList(list);
-        mutateUser();
-        toggleListModal();
+        const response = await listService.createList(list);
+        if(response.ok){
+            mutateUser();
+        }
+        toggleCreateListModal();
     }
+
+    const handleEditList = async (list: ListInput, id: number) => {
+        const response = await listService.editList(list, id);
+        if(response.ok){
+            mutateUser();
+        }
+        toggleEditListModal(null);
+    };
+
 
     const handleCreateReview = async (review: ReviewInput) => {
         await reviewService.createReview(review);
@@ -126,7 +139,11 @@ const Profile: React.FC = () => {
 
     const togglePromoteModal = () => setIsPromoteModal(!isPromoteModal);
     const toggleBlockModal = () => setIsBlockModal(!isBlockModal);
-    const toggleListModal = () => setIsListModalOpen(!isListModalOpen);
+    const toggleCreateListModal = () => setIsListModalOpen(!isListModalOpen);
+    const toggleEditListModal = (list: List | null) => {
+        setEditingList(list??null);
+        setIsListModalOpen(!isListModalOpen);
+    }
     const toggleReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
     const toggleDeleteList = (id?: number) => {
         setSelectedId(id ?? -1);
@@ -201,6 +218,11 @@ const Profile: React.FC = () => {
                             </>
                         )}
                     </div>
+                    {isFollower &&
+                        <div className="flex justify-center">
+                            <span className="text-center rounded-lg px-3 main-font text-sm transition-colors duration-100 text-text2 bg-text1 yadig-italic text">Follows you</span>
+                        </div>
+                    }
                 </div>
 
                 {(user.role === "admin" || user.role === "moderator") && (
@@ -251,7 +273,7 @@ const Profile: React.FC = () => {
                                     <>
                                         <h1 className="main-font text-text2 text-2xl sm:text-3xl lg:text-4xl">My Album Lists</h1>
                                         <button
-                                            onClick={toggleListModal}
+                                            onClick={toggleCreateListModal}
                                             type="button"
                                             className="mt-2 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-white transition-colors duration-100"
                                         >
@@ -264,7 +286,7 @@ const Profile: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 p-10 rounded-lg sm:pt-10 gap-4 overflow-y-auto">
                                 {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
-                                    <ListCard key={list.id} list={list} onDelete={isUserProfile ? toggleDeleteList : undefined} userId={user.id} />
+                                    <ListCard onEdit={()=>toggleEditListModal(list)} key={list.id} list={list} onDelete={isUserProfile ? toggleDeleteList : undefined} userId={user.id} />
                                 )) : (
                                     <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Lists To Show</h2>
                                 )}
@@ -274,12 +296,24 @@ const Profile: React.FC = () => {
                 )}
 
                 {isListModalOpen && user && (
-                    <ListModal
-                        isOpen={isListModalOpen}
-                        onClose={toggleListModal}
-                        onSave={handleCreateList}
-                        user={user}
-                    />
+                    <>
+                        {editingList ? (
+                            <ListModal
+                                isOpen={isListModalOpen}
+                                onClose={()=>toggleEditListModal(null)}
+                                onEdit={handleEditList}
+                                user={user}
+                                list={editingList}
+                            />
+                        ):(
+                            <ListModal
+                                isOpen={isListModalOpen}
+                                onClose={toggleCreateListModal}
+                                onSave={handleCreateList}
+                                user={user}
+                            />
+                        )}
+                    </>
                 )}
                 {isReviewModalOpen && user && (
                     <ReviewModal

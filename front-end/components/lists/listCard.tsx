@@ -9,10 +9,11 @@ import React from "react";
 type Props = {
     list: List;
     onDelete?: (id: number)=>void;
+    onEdit?: ()=>void;
     userId?: number
 }
 
-const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
+const ListCard: React.FC<Props> = ({list, onEdit, onDelete, userId}: Props) => {
     const { title, description, createdAt, albumIds } = list;
     const formattedDate = new Date(createdAt).toLocaleDateString();
 
@@ -32,6 +33,13 @@ const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
         }
         e.stopPropagation(); 
         router.push(`/listDetails/${list.id}`)   
+    }
+
+    const handleEdit = (e)=>{
+        if(!onEdit) return;
+        
+        e.stopPropagation(); 
+        onEdit();
     }
 
     const handleDelete = (e)=>{
@@ -67,9 +75,10 @@ const ListCard: React.FC<Props> = ({list, onDelete, userId}: Props) => {
                     /> 
                 </span>
                 <div className="flex gap-2">
-                {onDelete &&
+                {onEdit &&
                     <button
-                        className="rounded-lg px-2 sm:px-3 py-1 w-full flex justify-center sm:py-1 main-thin text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-text2 transition-colors duration-100">
+                        onClick={handleEdit}
+                        className="rounded-lg z-20 px-2 sm:px-3 py-1 w-full flex justify-center sm:py-1 main-thin text-xs sm:text-sm bg-text1 text-text2 hover:text-bg1 hover:bg-text2 transition-colors duration-100">
                         <IconEdit width={25} height={25}/>
                     </button>
                 }

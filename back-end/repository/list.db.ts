@@ -84,6 +84,26 @@ const createList = async (list: List, authorId: number): Promise<List> => {
     }
 }
 
+const editList = async (list: List, id: number): Promise<List> => {
+    try{
+        const listPrisma = await database.list.update({
+            data:{
+                title: list.getTitle(),
+                description: list.getDescription(),
+                albumIds: list.getAlbums(),
+            },
+            where: {id},
+            include: {
+                author: true,
+                likes: true
+            }
+        })
+        return List.from(listPrisma);
+    }catch(e){
+        throw new Error("DB ERROR");
+    } 
+}
+
 const likeList = async (id:number, username: string): Promise<List> => {
     try{
         const listPrisma = await database.list.update({
@@ -135,6 +155,7 @@ export default {
     getListById,
     getById,
     createList,
+    editList,
     getUserLists,
     likeList,
     unlikeList,

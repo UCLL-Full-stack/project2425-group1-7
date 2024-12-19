@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Album, ListInput, User } from "@/types/index";
+import { Album, List, ListInput, User } from "@/types/index";
 import albumService from "@/services/albumService";
 import AlbumListCard from "../album/albumListCard";
 import AlbumSearch from "../album/albumSearch";
@@ -7,14 +7,16 @@ import AlbumSearch from "../album/albumSearch";
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (newList: ListInput) => void;
+    onSave?: (newList: ListInput) => void;
+    onEdit?: (newList: ListInput, id: number)=>void;
     user: User,
+    list?: List,
 };
 
-const ListModal: React.FC<Props> = ({ isOpen, onClose, onSave, user }) => {
+const ListModal = ({ isOpen, onClose, onSave, onEdit, user, list }: Props) => {
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [title, setTitle] = useState(list?list.title:"");
+    const [description, setDescription] = useState(list?list.description:"");
     const [albums, setAlbums] = useState<Album[]>([]);
     const [query, setQuery] = useState<string>('');
     const [listAlbums, setListAlbums] = useState<Album[]>([]);
@@ -26,12 +28,28 @@ const ListModal: React.FC<Props> = ({ isOpen, onClose, onSave, user }) => {
                 setAlbums([]);
                 return;
             }
-            const albums = await albumService.searchAlbums(query);    
-            setAlbums(albums);
+            const fetchedAlbums = await albumService.searchAlbums(query);    
+            setAlbums(fetchedAlbums);
         }
         fetchAlbums();
-        console.log(albums);
     },[query]);
+
+    useEffect(() => {
+        const fetchListAlbums = async () => {
+            if (!list || !list.albumIds) return;
+
+            const fetchedListAlbums = await Promise.all(
+                list.albumIds.map(async (id) => {
+                    const details = id.split('_');
+                    return await albumService.fetchAlbum(details[0], details[1]);
+                })
+            );
+
+            setListAlbums(fetchedListAlbums);
+        };
+
+        fetchListAlbums();
+    }, [list]);
 
     const albumIsAdded = (album: Album) => {
         return listAlbums.find((a) => album.name == a.name && album.artist == a.artist);
@@ -64,7 +82,6 @@ const ListModal: React.FC<Props> = ({ isOpen, onClose, onSave, user }) => {
         }
 
         const albumIds = [...listAlbums.map((album)=>album.id)];
-        console.log(albumIds);
 
         if(!albumIds) return;
 
@@ -75,7 +92,12 @@ const ListModal: React.FC<Props> = ({ isOpen, onClose, onSave, user }) => {
             albums: albumIds
         };
 
-        onSave(newList);
+        if(onEdit && list){
+            onEdit(newList, list.id);
+            return;
+        }
+
+        if(onSave) onSave(newList); 
     };
 
     return (

@@ -104,6 +104,20 @@ listRouter.get('/:id', async (req: Request, res: Response, next: NextFunction)=>
     }
 });
 
+listRouter.put('/:id', async (req: Request, res: Response, next: NextFunction)=>{
+
+    try{
+        const request = req as Request & {auth: {username: string}}
+        const {username}= request.auth;
+        const id = Number(req.params['id']);
+        const list = <ListInput> req.body;
+        await listService.editList(list, id, username);
+        res.status(200).json(id);
+    }catch(e){
+        next(e);
+    }
+});
+
 listRouter.put('/like/:id', async (req: Request, res: Response, next: NextFunction)=>{
 
     try{
