@@ -21,6 +21,20 @@ const logIn = async({email, password}: UserInput): Promise<Response> => {
     });        
 }
 
+const fetchUsers = async (): Promise<Response> =>{
+    const loggedInUser = sessionStorage.getItem("LoggedInUser");
+    const user = JSON.parse(loggedInUser??"");
+    if (!user) return Response.error();
+
+    return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/`,{
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}`
+        },
+    });        
+}
+
 const findById = async(id: number): Promise<Response>=>{
     const loggedInUser = sessionStorage.getItem("LoggedInUser");
     const user = JSON.parse(loggedInUser??"");
@@ -104,6 +118,7 @@ const isJwtExpired = (token: string): boolean => {
 }
 
 export default {
+    fetchUsers,
     registerUser,
     logIn,
     findById,

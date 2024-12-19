@@ -4,6 +4,17 @@ import { Role } from '../types';
 
 export const userRouter = express.Router();
 
+userRouter.get('/', async (req: Request, res: Response, next: NextFunction)=>{
+    try{
+        const request = req as Request & {auth: {role: Role}}
+        const {role}= request.auth;
+        const users = await userService.getAllUsers(role);
+        res.status(200).json(users);
+    }catch(e){
+        next(e)
+    }
+})
+
 userRouter.get('/:id', async (req: Request, res: Response, next: NextFunction)=>{
     const id = Number(req.params["id"]);
 

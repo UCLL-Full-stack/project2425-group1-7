@@ -10,7 +10,7 @@ const searchAlbums = async (query: string): Promise<Album[]> => {
     const albumResponse: AlbumResponse = await response.json();
     const albums = albumResponse.results.albummatches.album;
     albums.forEach(album=>album.id=`${album.name}_${album.artist}`);
-    return albums.filter(a=>!!a.image);
+    return albums.filter(a=>!!a.image && a.name !== "(null)");
 }
 
 const fetchAlbum = async (title: string, artist: string): Promise<Album> => {
@@ -25,7 +25,20 @@ const fetchAlbum = async (title: string, artist: string): Promise<Album> => {
     return album;
 }
 
+const getAlbumsByFrequency = (albums: string[]): string[] => {
+    const frequencyMap: Record<string, number> = {};
+    albums.forEach(item=>{
+        frequencyMap[item] = (frequencyMap[item] || 0) + 1;
+    });
+
+    const sorted = Object.keys(frequencyMap)
+                    .sort((a,b) => frequencyMap[b] - frequencyMap[a])
+    return sorted;
+};
+
+
 export default {
     searchAlbums,
-    fetchAlbum
+    fetchAlbum,
+    getAlbumsByFrequency
 }

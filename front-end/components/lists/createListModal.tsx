@@ -100,7 +100,7 @@ const ListModal: React.FC<Props> = ({ isOpen, onClose, onSave, user }) => {
                         className="block bg-bg4 text-text2 w-full mt-1 p-2 rounded"
                     />
                 </label>
-                <AlbumSearch albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
+                <AlbumSearch label="Albums" albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
                 <AlbumListCard albums={listAlbums} onRemove={handleRemoveAlbum}/>
                 {error && 
                     <div className="w-full text-center text-text2 border-1 rounded-md bg-red-500 p-2">
