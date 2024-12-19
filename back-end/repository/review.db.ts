@@ -42,6 +42,27 @@ const findById = async(id: number): Promise<Review | null> => {
     }
 }
 
+const findByAlbumId = async(id: string): Promise<Review[] | null> => {
+    try{
+        const reviewsPrisma = await database.review.findMany({
+            where: {albumID: id},
+            include: {
+                author: true,
+                comments: {
+                    include: {
+                        author: true
+                    }
+                },
+                likes: true
+            }
+        })
+        if (!reviewsPrisma) return null;
+        return reviewsPrisma.map(r=>Review.from(r));
+    }catch(e){
+        throw new Error("DB Error");
+    }
+}
+
 const findUserReviews = async(id: number): Promise<Review[]>=>{
     try{
         const reviewsPrisma = await database.review.findMany({
@@ -140,6 +161,7 @@ const deleteReview = async (id: number)=>{
         await database.review.delete({
             where: {id: id}
         });
+        return id;
     }catch(e){
         throw new Error("DB ERROR (review)");
     }
@@ -147,6 +169,7 @@ const deleteReview = async (id: number)=>{
 
 export default{
     findAllReviews,
+    findByAlbumId,
     findById,
     findUserReviews,
     createReview,

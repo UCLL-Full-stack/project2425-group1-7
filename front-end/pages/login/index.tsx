@@ -50,7 +50,7 @@ const Login: React.FC = () => {
 
         setSuccess(true);
         setTimeout(()=>{
-            router.push("/");
+            router.back();
         }, 1500)
     };
 

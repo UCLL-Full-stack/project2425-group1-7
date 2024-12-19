@@ -10,7 +10,7 @@ const ConfirmModal = ({id, handler, onClose, message, isDeleting}: Props)=>{
 
     return (
         <div
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 opacity-100 pointer-events-auto`}
+            className={`fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 opacity-100 pointer-events-auto`}
         >
             <div className="bg-bg1 rounded-lg p-6 w-full max-w-xs shadow-md transform transition-transform duration-200">
                 {message && <h2 className="text-xl main-font text-center text-text2 pb-8">{message}</h2>}

@@ -10,7 +10,7 @@ const searchAlbums = async (query: string): Promise<Album[]> => {
     const albumResponse: AlbumResponse = await response.json();
     const albums = albumResponse.results.albummatches.album;
     albums.forEach(album=>album.id=`${album.name}_${album.artist}`);
-    return albums;
+    return albums.filter(a=>!!a.image);
 }
 
 const fetchAlbum = async (title: string, artist: string): Promise<Album> => {

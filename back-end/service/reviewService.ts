@@ -20,6 +20,16 @@ const getReviewById = async(id: number): Promise<Review> => {
     }
 };
 
+const getAlbumReviews = async(id: string): Promise<Review[]> => {
+    try{
+        const reviews = await reviewDb.findByAlbumId(id);  
+        if (!reviews) throw new Error("no Reviews found for "+ id.split('_')[0]);
+        return reviews;
+    }catch(e){
+        throw e;
+    }
+};
+
 const createReview = async (newReview: ReviewInput): Promise<Review> => {
     try{
         const review = new Review({
@@ -70,6 +80,7 @@ const deleteReview = async (id: number) =>{
 
 export default{
     getAllReviews,
+    getAlbumReviews,
     getReviewById,
     createReview,
     deleteReview,

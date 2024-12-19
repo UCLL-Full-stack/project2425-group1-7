@@ -9,98 +9,84 @@ import { Album, List, User } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import useSWR from "swr";
 
 const ListDetails = () => {
     const router = useRouter();
     const { id } = router.query;
 
-    const [isLiked, setIsLiked] = useState<boolean>();
-    const [likeCount, setLikeCount] = useState<number>(0);
-    const [clicked, setClicked] = useState<boolean>(false);
-    const [user, setUser] = useState<User>();
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>("");
-
-    const {data} = useSWR<{list: List, albums: Album[]}>(
-        id ? `listWithAlbums/${id}` : null,
-        () => fetchListWithAlbums(Number(id))
-    );
-
-    useEffect(()=>{
-        const getUser = () => {
+    const { data: user, error: userError } = useSWR<User>(
+        'user',
+        () => {
             const userString = sessionStorage.getItem("LoggedInUser");
             if (userString && !userService.isJwtExpired(JSON.parse(userString).token)) {
                 const u = JSON.parse(userString);
-                setUser({
+                return {
                     id: u.id,
                     username: u.username,
                     isBlocked: u.isBlocked,
                     role: u.role
-                });
-                return;
+                };
             }
+            throw new Error('User not authenticated');
+        }
+    );
 
+    const { data: listData, error: listError, mutate: mutateList } = useSWR<{list: List, albums: Album[]}>(
+        id ? `listWithAlbums/${id}` : null,
+        () => fetchListWithAlbums(Number(id))
+    );
+
+    // Handle authentication and blocking
+    useEffect(() => {
+        if (userError) {
             router.push("/login");
-        };
-
-        getUser();
-    },[])
-
-    if (user && user.isBlocked){
-        router.push('/blocked');
-    }
-
-    useEffect(()=>{
-        if(!user || !data){
-            setIsLoading(true);
-            return;
         }
+    }, [userError, router]);
 
-        if (data.list.author.isBlocked){
-            setError("List No Longer Exists");
-            setIsLoading(false);
-            return;
+    useEffect(() => {
+        if (user?.isBlocked) {
+            router.push('/blocked');
         }
+    }, [user, router]);
 
-        const likedByUser = data.list.likes.find(like => like === user.id);
-        setIsLiked(!!likedByUser);
-        setLikeCount(data.list.likes.length);
-        setIsLoading(false);
-    }, [user, data])
+    const handleLike = useCallback(async () => {
+        if (!listData?.list || !user) return;
 
-    useEffect(()=>{
-        if(!data) return;
-        if(!user?.id || !clicked)return;
+        const isCurrentlyLiked = listData.list.likes.includes(user.id);
+        const newLikes = isCurrentlyLiked
+            ? listData.list.likes.filter(like => like !== user.id)
+            : [...listData.list.likes, user.id];
 
-        updateLikes();
-        if(isLiked)
-            data.list.likes.push(user?.id); 
-        else
-            data.list.likes = data.list.likes.filter(like => like !== user.id);
+        mutateList(
+            {
+                ...listData,
+                list: { ...listData.list, likes: newLikes }
+            },
+            false
+        );
 
-        setLikeCount(data.list.likes.length);
-    },[isLiked]);
-    
-    const updateLikes = async () => {
-        if(!data || !user) return;
+        // Make API call
+        const response = isCurrentlyLiked
+            ? await listService.unlikeList(listData.list.id)
+            : await listService.likeList(listData.list.id);
 
-        const response = isLiked? await listService.likeList(data.list.id): await listService.unlikeList(data.list.id);
-        if(!response.ok){
-            setError(await response.json());
+        if (!response.ok) {
+            // Revert on error
+            mutateList();
         }
-    }
+    }, [listData, user, mutateList]);
 
-    const handleLike = ()=>{
-        setClicked(true);
-        setIsLiked(!isLiked);
-    };
+    const isLoading = !listData && !listError;
+    const isLiked = listData?.list.likes.includes(user?.id ?? -1);
+    const likeCount = listData?.list.likes.length ?? 0;
+    const error = listError?.message || (listData?.list.author.isBlocked ? "List No Longer Exists" : "");
 
     return (
         <>
             <Head>
-                <title>{data?.list ? (data.list.title + "- Yadig") : "List Details"}</title>
+                <title>{listData?.list ? (listData.list.title + " - Yadig") : "List Details"}</title>
             </Head>
             <div className="flex flex-col h-screen">
                 <Header current="home" user={user}/>
@@ -114,34 +100,37 @@ const ListDetails = () => {
                     <div className="flex justify-center items-center">
                         <IconDisc height={100} width={100}/>
                     </div>
-                ):(!error && data && user && 
+                ):(!error && listData && user && 
                         <div className="max-w-4xl mx-auto bg-text1 p-6 rounded-lg shadow-md">
                             <div className="flex justify-between pr-6">
-                                <h1 className="text-4xl font-bold mb-4 text-text2">{data.list?.title}</h1>
+                                <h1 className="text-4xl font-bold mb-4 text-text2">{listData.list?.title}</h1>
                                 <div className="mb-4 flex gap-2">
                                     <h2 className="text-xl main-thin text-text2">By</h2>
                                     <Link
-                                        href={`/profile/${data.list.author.id}`}
+                                        href={`/profile/${listData.list.author.id}`}
                                         className="text-xl main-font text-bg2 hover:text-text2 hover:scale-105 duration-100">
-                                        {data.list.author.username ?? 'Unknown'}
+                                        {listData.list.author.username ?? 'Unknown'}
                                     </Link>
                                 </div>
                             </div>
                             <div className="m-5">
-                                <p className="main-thin text-md text-bg2">{data.list?.description}</p>
+                                <p className="main-thin text-md text-bg2">{listData.list?.description}</p>
                             </div>
                             <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">
-                                <p> {likeCount} </p>
+                                <p>{likeCount}</p>
                                 <IconLike
                                     onClick={handleLike}
                                     width={25} height={25} 
-                                    className={isLiked?"text-green-500 hover:scale-105 hover:text-red-500 duration-100":"hover:text-green-500 hover:scale-105 text-text2 duration-100"}
+                                    className={isLiked
+                                        ? "text-green-500 hover:scale-105 hover:text-red-500 duration-100"
+                                        : "hover:text-green-500 hover:scale-105 text-text2 duration-100"
+                                    }
                                 /> 
                             </span>
                             <h2 className="text-xl main-font text-center mb-2 text-text2">Albums</h2>
-                            {data.albums && data.albums.length > 0 && (
+                            {listData.albums && listData.albums.length > 0 && (
                                 <div className={`w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4`}>
-                                    {data.albums.map(album=>(
+                                    {listData.albums.map(album => (
                                        <AlbumCard key={album.id} album={album}/>
                                     ))}
                                 </div>
@@ -170,4 +159,5 @@ const fetchListWithAlbums = async (id: number): Promise<{list: List, albums: Alb
 
     return { list, albums };
 };
+
 export default ListDetails;

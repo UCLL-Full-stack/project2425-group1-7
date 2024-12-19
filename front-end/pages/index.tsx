@@ -71,16 +71,16 @@ const Home = ({ lists, reviews, albums }: Props) => {
                             <div className="slider-container">
                             {lists.length > 0 ?(
                                 <div className="slider">
-                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                    {lists.slice(0, 15).map((list) => (
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                    {lists.slice(0, 15).map((list) => (
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                    {lists.slice(0, 15).map((list) => (
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
-                                    {lists.slice(0, Math.min(lists.length, 15)).map((list) => (
+                                    {lists.slice(0, 15).map((list) => (
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
                                 </div>
@@ -154,13 +154,15 @@ export const getServerSideProps = async () => {
         if(!response.ok){
             throw new Error("error fetching reviews");
         }
-        const reviews: Review[] = await response.json();
+        const fetchedReviews: Review[] = await response.json();
+        const reviews = fetchedReviews.filter(r=> !r.author.isBlocked).slice(0,15)
 
         response = await listService.getAllLists();
         if(!response.ok){
             throw new Error("error fetching lists");
         }
-        const lists: List[] = await response.json();
+        const fetchedLists: List[] = await response.json();
+        const lists = fetchedLists.filter(l=> !l.author.isBlocked).slice(0,15)
 
         const albumIds: string[] = [];
         reviews.map(r=>albumIds.push(r.albumId));
@@ -174,8 +176,8 @@ export const getServerSideProps = async () => {
         );
 
         return {props: {
-            lists: lists.filter(l=> !l.author.isBlocked), 
-            reviews: reviews.filter(r=> !r.author.isBlocked),
+            lists: lists, 
+            reviews: reviews,
             albums: albums.slice(0,8)
         }};
     }catch(e){

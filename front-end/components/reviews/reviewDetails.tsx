@@ -1,48 +1,42 @@
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import AlbumCard from "@/components/album/albumCard";
 import IconComment from "@/components/ui/comment";
 import IconLike from "@/components/ui/like";
 import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import reviewService from "@/services/reviewService";
-import { Album, User, Review } from "@/types/index";
+import { User, Review } from "@/types/index";
 import { Rating } from "@mui/material";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-type Props={
+type Props = {
     user: User,
     review: Review,
-    handleClickComment: (id: number)=>void
+    handleClickComment: (id: number) => void
 }
 
+const albumFetcher = async (albumId: string) => {
+    const details = albumId.split("_");
+    const album = await albumService.fetchAlbum(details[0], details[1]);
+    return album;
+};
+
 const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
-    const [album, setAlbum] = useState<Album | null>(null);
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>("");
     const [clicked, setClicked] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (!review) {
-            setIsLoading(false);
-            return;
+    const { data: album, error } = useSWR(
+        review ? review.albumId : null,
+        albumFetcher,
+        {
+            revalidateOnFocus: false
         }
+    );
 
-        const fetchAlbum = async () => {
-            try {
-                const details = review.albumId.split("_");
-                const fetchedAlbum = await albumService.fetchAlbum(details[0], details[1]);
-                setAlbum(fetchedAlbum);
-            } catch (err) {
-                setError("Error fetching album");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchAlbum();
-
+    useEffect(() => {
+        if (!review) return;
         const userLiked = review.likes.find((like) => like === user.id);
         setIsLiked(!!userLiked);
         setLikeCount(review.likes.length);
@@ -60,7 +54,9 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
                     throw new Error("Error updating likes");
                 }
             } catch (err) {
-                setError("Error updating likes");
+                setIsLiked(!isLiked);
+                setLikeCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
+                console.error("Error updating likes:", err);
             }
         };
 
@@ -79,7 +75,7 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
         setIsLiked(!isLiked);
     };
 
-    if (isLoading) {
+    if (!album && !error) {
         return (
             <div className="flex justify-center items-center">
                 <IconDisc height={100} width={100} />
@@ -88,7 +84,7 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
     }
 
     if (error) {
-        return <span className="text-red-800 main-font">{error}</span>;
+        return <span className="text-red-800 main-font">Error fetching album</span>;
     }
 
     if (!user || !album || !review) {
@@ -100,11 +96,21 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
             <div className="grid grid-cols-4">
                 <div className="flex justify-center flex-wrap">
                     <AlbumCard album={album} />
-                    <Rating className="text-center p-2" size="large" readOnly value={review.starRating} />
+                    <Rating 
+                        className="text-center p-2 bg-bg3 rounded-md m-2" 
+                        size="large" 
+                        readOnly 
+                        value={review.starRating} 
+                    />
                 </div>
                 <div className="col-span-3 p-4">
-                    <div className="flex justify-between items-baseline ">
-                        <h1 onClick={()=>handleClickComment(review.id)} className="hover:scale-105 text-4xl font-bold mb-4 text-text2 duration-100 truncate">{review.title}</h1>
+                    <div className="flex justify-between items-baseline">
+                        <h1 
+                            onClick={() => handleClickComment(review.id)} 
+                            className="hover:scale-105 text-4xl font-bold mb-4 text-text2 duration-100 truncate"
+                        >
+                            {review.title}
+                        </h1>
                         <div className="mb-4 flex gap-2">
                             <h2 className="text-xl main-thin text-text2">By</h2>
                             <Link
@@ -124,14 +130,14 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
             </div>
             <div className="flex items-start justify-end gap-2 text-xs sm:text-sm text-text2 main-font">
                 <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">
-                    <p> {likeCount} </p>
+                    <p>{likeCount}</p>
                     <IconLike
                         width={25}
                         height={25}
                         className={`duration-100 hover:scale-105 ${
                             isLiked
-                                ? "text-green-500 hover:text-red-500 "
-                                : "text-text2 hover:text-green-500 "
+                                ? "text-green-500 hover:text-red-500"
+                                : "text-text2 hover:text-green-500"
                         }`}
                         onClick={handleLike}
                     />
@@ -139,7 +145,7 @@ const ReviewDetails = ({ user, review, handleClickComment }: Props) => {
                 <span className="flex items-center gap-2 text-xs sm:text-sm text-text2 main-font">
                     <p>{review.comments.length}</p>
                     <IconComment
-                        onClick={()=>handleClickComment(review.id)}
+                        onClick={() => handleClickComment(review.id)}
                         className="hover:scale-110 duration-100 text-text2 hover:text-bg1"
                         width={25}
                         height={25}

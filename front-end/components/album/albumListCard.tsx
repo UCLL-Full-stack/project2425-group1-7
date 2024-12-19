@@ -3,12 +3,13 @@ import { Album } from "@/types/index";
 type Props={
     albums: Album[];
     onRemove?: (album: Album)=>void;
+    review?: boolean;
 }
 
-const AlbumListCard = ({albums, onRemove}: Props) => {
+const AlbumListCard = ({albums, onRemove, review}: Props) => {
 
     return(
-        <div className={albums.length>0?"border rounded-md border-text2":""}>
+        <div className={albums.length>0?`border ${review?"rounded-t-md":"rounded-md"} border-text2`:""}>
             {albums.map((album: Album, i)=>
                     <div key={i} className="w-full justify-between flex gap-5 p-2 items-center">
                         <div className="flex gap-5 items-center">
