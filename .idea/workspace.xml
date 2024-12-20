@@ -6,11 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/controller/comment.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/comment.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/controller/list.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/list.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/controller/review.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/review.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/controller/user.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/user.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/Analysis.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Analysis.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/Conceptual Model.drawio" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/Our ERD.drawio" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/UML.drawio" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
