@@ -4,8 +4,8 @@ export type Album = {
     id: string,
     name: string,
     artist: string,
-    playcount: number,
     image: {"#text": string, size: string}[],
+    playcount?: number,
     wiki?: {
         content: string,
         summary: string,

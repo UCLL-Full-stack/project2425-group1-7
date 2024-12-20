@@ -11,7 +11,7 @@ import { Input } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 
 const Discover = () => {
     const router = useRouter();
@@ -26,20 +26,20 @@ const Discover = () => {
         fetchUsers
     );
 
-    const {data: initialAlbums, isLoading: isLoadingInitial} = useSWR<Album[]>(
+    const {data: initialAlbums} = useSWR<Album[]>(
         'initial-albums',
         fetchInitialAlbums
     );
 
-    const {data: searchResults, isLoading: isLoadingSearch} = useSWR<Album[]>(
+    const {data: searchResults, isLoading} = useSWR<Album[]>(
         albumQuery ? ['albums', albumQuery] : null,
         () => searchAlbums(albumQuery),
         {
-            keepPreviousData: true
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
         }
     );
 
-    const isLoadingAlbums = isLoadingInitial || isLoadingSearch;
     const albums = albumQuery ? searchResults : initialAlbums;
 
     useEffect(() => {
@@ -81,7 +81,7 @@ const Discover = () => {
         router.push('/blocked');
     }
 
-    return (user && albums && users &&
+    return (user && users && 
         <>
             <Head>
                 <title>Yadig</title>
@@ -89,7 +89,9 @@ const Discover = () => {
             <div className="flex flex-col h-screen">
                 <Header current="discover" user={user}/>
                 {error ? (
-                    <></>
+                    <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
+                        <span className="text-red-800 main-font">{error}</span>
+                    </div>
                 ) : (
                 <main className="flex-1 bg-bg1 p-10 overflow-hidden flex gap-6">
                     <section className="w-3/4 overflow-y-auto">
@@ -103,9 +105,11 @@ const Discover = () => {
                                 discover={true}
                             />
                         </div>
-                        {!albums? (
-                            <div className="flex justify-center items-center h-64">
-                                <IconDisc className="w-7 h-8 animate-spin text-text2" />
+                        {isLoading || !albums ? (
+                            <div className="grid justify-center grid-cols-6 xs:grid-cols-1 md:grid-cols-4 xl:grid-cols-5 gap-6 p-2">
+                            {Array(20).fill(0).map((_, index) => (
+                                <IconDisc key={index} className="animate-spin text-text2" width={48} height={48} />
+                            ))}
                             </div>
                         ) : (
                             <div className="grid grid-cols-6 xs:grid-cols-1 md:grid-cols-4 xl:grid-cols-5 gap-6 p-2">

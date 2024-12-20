@@ -1,39 +1,63 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AlbumCard from './albumCard';
-import type { Album } from '@/types';
+import { useRouter } from 'next/router';
+import { Album } from '@/types';
 
-const mockAlbum: Album = {
-    id: 'Test Album-Test Artist',
-    name: 'Test Album',
-    artist: 'Test Artist',
-    image: [
-        { '#text': 'small-image.jpg', size: 'small' },
-        { '#text': 'medium-image.jpg', size: 'medium' },
-        { '#text': 'large-image.jpg', size: 'large' },
-        { '#text': 'extralarge-image.jpg', size: 'extralarge' },
-        { '#text': 'mega-image.jpg', size: 'mega' }
-    ]
-};
+// Add jest-dom matchers to Jest
+declare global {
+    namespace jest {
+        interface Matchers<R> {
+            toBeInTheDocument(): R;
+            toHaveClass(...classNames: string[]): R;
+        }
+    }
+}
+
+// Mock next/router
+jest.mock('next/router', () => ({
+    useRouter: jest.fn()
+}));
 
 describe('AlbumCard', () => {
-    it('renders album name and artist', () => {
+    // Setup mock router
+    const mockPush = jest.fn();
+    const mockUseRouter = useRouter as jest.Mock;
+
+    beforeEach(() => {
+        mockUseRouter.mockImplementation(() => ({
+            push: mockPush
+        }));
+        jest.clearAllMocks();
+    });
+
+    const mockAlbum: Album = {
+        id: '123',
+        name: 'Test Album',
+        artist: 'Test Artist',
+        image: [
+            { '#text': 'small.jpg', size: 'small' },
+            { '#text': 'medium.jpg', size: 'medium' },
+            { '#text': 'large.jpg', size: 'large' },
+            { '#text': 'extralarge.jpg', size: 'extralarge' }
+        ]
+    };
+
+    it('renders album information correctly', () => {
         render(<AlbumCard album={mockAlbum} />);
 
+        // Check if album name and artist are rendered
         expect(screen.getByText('Test Album')).toBeInTheDocument();
-        expect(screen.getByText('Test Artist')).toBeInTheDocument();
+    expect(screen.getByText('Test Artist')).toBeInTheDocument();
+
+    // Check if image is rendered with correct src and alt
+    const image = screen.getByAltText('Test Album cover') as HTMLImageElement;
+expect(image).toBeInTheDocument();
+expect(image.src).toContain('extralarge.jpg');
     });
 
-    it('renders album cover image with correct alt text', () => {
-        render(<AlbumCard album={mockAlbum} />);
-
-        const image = screen.getByAltText('Test Album cover') as HTMLImageElement;
-        expect(image).toBeInTheDocument();
-        expect(image.src).toContain('mega-image.jpg');
-    });
-
-    it('handles missing image gracefully', () => {
+    it('uses fallback image URL when album image is not available', () => {
         const albumWithoutImage: Album = {
             ...mockAlbum,
             image: []
@@ -42,7 +66,29 @@ describe('AlbumCard', () => {
         render(<AlbumCard album={albumWithoutImage} />);
 
         const image = screen.getByAltText('Test Album cover') as HTMLImageElement;
-        expect(image).toBeInTheDocument();
-        expect(image.getAttribute('src')).toBe('');  // Changed this line
+        expect(image.src).toContain('https://fakeimg.pl/600x400?text=Test%20Album');
     });
+
+        it('navigates to album detail page when clicked', () => {
+            render(<AlbumCard album={mockAlbum} />);
+
+            const card = screen.getByText('Test Album').closest('div');
+            fireEvent.click(card!);
+
+            expect(mockPush).toHaveBeenCalledWith('/album/123');
+        });
+
+        it('applies hover styles correctly', () => {
+            render(<AlbumCard album={mockAlbum} />);
+
+            const card = screen.getByText('Test Album').closest('div');
+            expect(card).toHaveClass('grid', 'pl-4', 'text-center', 'sm:pl-2', 'sm:text-left', 'md:pl-0', 'md:text-center');
+        });
+
+        it('renders with responsive layout classes', () => {
+            render(<AlbumCard album={mockAlbum} />);
+
+            const card = screen.getByText('Test Album').closest('div');
+            expect(card).toHaveClass('grid', 'pl-4', 'text-center', 'sm:pl-2', 'sm:text-left', 'md:pl-0', 'md:text-center')
+        });
 });

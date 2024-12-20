@@ -4,6 +4,7 @@ import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import HoverTitle from "@/components/ui/hoverTitle";
 import IconDisc from "@/components/ui/loading";
+import TestUsersModal from "@/components/users/testUsersModal";
 import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
@@ -29,6 +30,7 @@ const fetcher = async (albumDetails: string[]) => {
 const Home = ({ lists, reviews, initialAlbumIds }: Props) => {
     const router = useRouter();
     const [user, setUser] = useState<User>();
+    const [userModal, setUserModal] = useState<boolean>(false);
 
     const sortedAlbumIds = albumService.getAlbumsByFrequency(initialAlbumIds);
     const albumDetails = sortedAlbumIds.slice(0, 8).map(id => id.split('_'));
@@ -59,6 +61,8 @@ const Home = ({ lists, reviews, initialAlbumIds }: Props) => {
         getUser();
     }, []);
 
+    const toggleUserModal=()=>{setUserModal(!userModal)};
+
     if (user && user.isBlocked){
         router.push('/blocked');
     }
@@ -70,13 +74,18 @@ const Home = ({ lists, reviews, initialAlbumIds }: Props) => {
             </Head>
             <div className="flex flex-col h-screen">
                 <Header current="home" user={user} />
-                <div className="bg-bg1 xs:p-4 lg:p-8 w-screen grid gap-3">
+                <div className="bg-bg1 xs:p-4 lg:p-8 w-screen grid justify-center gap-3">
                     <span className="text-center main-font text-text2 sm:text-xl md:text-4xl">
                         {user ? `welcome back ${user.username}` : "welcome newcomer"} 
                     </span>
                     <span className="text-center yadig-italic text-text2 text-xl">
                         {user ? "what are you digging today?" : "Log in and start Digging 🎧"}
                     </span>
+                </div>
+                <div className="flex bg-bg1 justify-center text-center main-font text-text2">
+                    <button onClick={toggleUserModal} className="bg-text1 p-2 rounded-lg max-w-[10vw] hover:scale-105 duration-100">
+                        SEE LIST OF USERS FOR TESTING
+                    </button>
                 </div>
                 <main className="flex-1 grid sm:grid-cols-1 md:grid-cols-2 gap-4 bg-bg1 xs:px-2 p-10 overflow-y-auto">
                     <section className="px-4 xs:p-2 grid items-center text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
@@ -159,6 +168,9 @@ const Home = ({ lists, reviews, initialAlbumIds }: Props) => {
                     </section>
                 </main>
             </div>
+            {userModal &&
+                <TestUsersModal onClose={toggleUserModal}/>
+            }
         </>
     );
 };
