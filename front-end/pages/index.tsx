@@ -154,7 +154,7 @@ export const getServerSideProps = async () => {
         const lists = fetchedLists.filter(l=> !l.author.isBlocked).slice(0,15)
 
         const albumIds: string[] = [];
-        reviews.map(r=>albumIds.push(r.albumId));
+        fetchedReviews.map(r=>albumIds.push(r.albumId));
         const sortedAlbumIds = albumService.getAlbumsByFrequency(albumIds);
 
         const albumDetails = sortedAlbumIds.map(id => id.split('_'));

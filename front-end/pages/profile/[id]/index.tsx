@@ -233,7 +233,7 @@ const Profile: React.FC = () => {
                             </>
                         )}
                     </div>
-                    {isFollower &&
+                    {!isUserProfile && isFollower &&
                         <div className="flex justify-center">
                             <span className="text-center rounded-lg px-3 main-font text-sm transition-colors duration-100 text-text2 bg-text1 yadig-italic text">Follows you</span>
                         </div>
@@ -307,7 +307,7 @@ const Profile: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 pt-6 p-10 rounded-lg sm:pt-10 gap-4 overflow-y-auto">
                                 {user.lists && user.lists.length > 0 ? user.lists.map((list) => (
-                                    <ListCard onEdit={()=>toggleEditListModal(list)} key={list.id} list={list} onDelete={isUserProfile ? toggleDeleteList : undefined} userId={user.id} />
+                                    <ListCard onEdit={isUserProfile?()=>toggleEditListModal(list):undefined} key={list.id} list={list} onDelete={isUserProfile ? toggleDeleteList : undefined} userId={user.id} />
                                 )) : (
                                     <h2 className="col-span-1 sm:col-span-2 text-center main-font text-white">No Lists To Show</h2>
                                 )}
