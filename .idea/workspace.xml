@@ -6,15 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7e6257b2-65f9-4873-b31a-d80777856c6f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/service/listService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/service/listService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/model/comment.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/comment.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/model/list.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/list.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/model/review.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/review.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/model/user.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/model/user.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/service/commentService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/commentService.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/service/listService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/listService.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/service/reviewService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/reviewService.test.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/test/service/userService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/test/service/userService.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/controller/comment.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/comment.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/controller/list.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/list.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/controller/review.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/review.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/controller/user.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/controller/user.routes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +63,7 @@
     "Jest.user.test.ts.executor": "Run",
     "Jest.userService.test.ts.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "testing",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/sdezd/Desktop/DOC/UCLL/2ND YEAR/Full-Stack/PROJECT/project2425-group1-7",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -231,7 +227,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/back-end/test/service/userService.test.ts</url>
           <line>102</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

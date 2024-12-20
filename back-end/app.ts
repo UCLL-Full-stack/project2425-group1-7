@@ -29,6 +29,7 @@ app.use(
         algorithms: ['HS256']
     }).unless({
         path: [
+            {url: /^\/api-docs|\/swagger\.json$/, methods: ['GET']},
             {url: '/users/login', methods: ['POST']},
             {url: '/users/signup', methods: ['POST']},
             {url: '/lists', methods: ['GET']},
