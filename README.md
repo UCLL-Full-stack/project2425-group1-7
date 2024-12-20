@@ -30,5 +30,9 @@ NEXT_PUBLIC_LASTFM_API_KEY={LASTFM_API_KEY}
 $ npm i
 $ npm start
 ```
+#### Testing (backend and frontend):
+```
+$npm test
+```
 
 ### Adam Benkhazzi / Sadra Dezdar
