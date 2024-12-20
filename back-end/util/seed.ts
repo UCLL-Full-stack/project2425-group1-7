@@ -163,7 +163,7 @@ const main = async () => {
         }
     });
 
-    const mod1 = await prisma.user.create({
+    const adam = await prisma.user.create({
         data: {
             username: "fr3udian",
             email: "adam@yadig.com",
@@ -172,12 +172,12 @@ const main = async () => {
         }
     });
 
-    const mod2 = await prisma.user.create({
+    const dezz = await prisma.user.create({
         data: {
             username: "dezz",
             email: "dezz@yadig.com",
-            password: await hash("dezzDaMod", 12),
-            role: "moderator"
+            password: await hash("dezzDaLameUser", 12),
+            role: "user"
         }
     });
 
@@ -287,7 +287,7 @@ const main = async () => {
     }
 
     // Create lists (1-2 per user)
-    for (const user of [...users, admin, mod1, mod2]) {
+    for (const user of [...users, admin, adam, dezz]) {
         const numLists = 1 + Math.floor(Math.random() * 2);
         for (let i = 0; i < numLists; i++) {
             const { title, desc } = generateList();

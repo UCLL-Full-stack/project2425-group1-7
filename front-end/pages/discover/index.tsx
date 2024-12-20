@@ -1,6 +1,7 @@
 import AlbumCard from "@/components/album/albumCard";
 import AlbumSearch from "@/components/album/albumSearch";
 import Header from "@/components/header";
+import IconDisc from "@/components/ui/loading";
 import UserCard from "@/components/users/userCard";
 import albumService from "@/services/albumService";
 import reviewService from "@/services/reviewService";
@@ -10,27 +11,36 @@ import { Input } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 
-type Props = {
-    reviewedAlbums: Album[];
-    users: User[];
-}
-
-const Discover = ({reviewedAlbums }: Props) => {
-
+const Discover = () => {
     const router = useRouter();
     const [error, setError] = useState<string>("");
     const [user, setUser] = useState<User>();
     const [userList, setUserList] = useState<User[]>();
     const [userQuery, setUserQuery] = useState<string>("");
     const [albumQuery, setAlbumQuery] = useState<string>("");
-    const [albums, setAlbums] = useState<Album[]>(reviewedAlbums);
 
     const {data: users} = useSWR<User[]>(
         '/users', 
         fetchUsers
     );
+
+    const {data: initialAlbums} = useSWR<Album[]>(
+        'initial-albums',
+        fetchInitialAlbums
+    );
+
+    const {data: searchResults, isLoading} = useSWR<Album[]>(
+        albumQuery ? ['albums', albumQuery] : null,
+        () => searchAlbums(albumQuery),
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
+        }
+    );
+
+    const albums = albumQuery ? searchResults : initialAlbums;
 
     useEffect(() => {
         const getUser = () => {
@@ -45,27 +55,13 @@ const Discover = ({reviewedAlbums }: Props) => {
                 });
                 return;
             }
-
             router.push("/login");
         };
         getUser();
-        setAlbums(reviewedAlbums);
         if(users){
             setUserList(users.slice(0,10));
         }
     }, []);
-
-    useEffect(()=>{
-        if(albumQuery == ''){
-            setAlbums(reviewedAlbums);
-            return;
-        }
-
-        const getAlbums = async ()=>{
-            setAlbums(await searchAlbums(albumQuery));
-        }
-        getAlbums();
-    }, [albumQuery]);
 
     useEffect(()=>{
         if(!users) return;
@@ -85,17 +81,18 @@ const Discover = ({reviewedAlbums }: Props) => {
         router.push('/blocked');
     }
 
-    return (user && albums && users &&
+    return (user && users && 
         <>
             <Head>
                 <title>Yadig</title>
             </Head>
             <div className="flex flex-col h-screen">
                 <Header current="discover" user={user}/>
-                {error?(
-                    <>
-                    </>
-                ):(
+                {error ? (
+                    <div className="flex-1 flex flex-col justify-center lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
+                        <span className="text-red-800 main-font">{error}</span>
+                    </div>
+                ) : (
                 <main className="flex-1 bg-bg1 p-10 overflow-hidden flex gap-6">
                     <section className="w-3/4 overflow-y-auto">
                         <div className="flex flex-col justify-center items-center gap-4 mb-6">
@@ -108,11 +105,19 @@ const Discover = ({reviewedAlbums }: Props) => {
                                 discover={true}
                             />
                         </div>
-                        <div className="grid grid-cols-6 xs:grid-cols-1 md:grid-cols-4 xl:grid-cols-5 gap-6 p-2">
-                            {albums.length > 0 && albums.map(album=>(
-                                <AlbumCard key={album.id} album={album}/>
+                        {isLoading || !albums ? (
+                            <div className="grid justify-center grid-cols-6 xs:grid-cols-1 md:grid-cols-4 xl:grid-cols-5 gap-6 p-2">
+                            {Array(20).fill(0).map((_, index) => (
+                                <IconDisc key={index} className="animate-spin text-text2" width={48} height={48} />
                             ))}
-                        </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-6 xs:grid-cols-1 md:grid-cols-4 xl:grid-cols-5 gap-6 p-2">
+                                {albums && albums.length > 0 && albums.map(album=>(
+                                    <AlbumCard key={album.id} album={album}/>
+                                ))}
+                            </div>
+                        )}
                     </section>
 
                     <section className="w-1/4 overflow-y-auto p-10">
@@ -129,7 +134,7 @@ const Discover = ({reviewedAlbums }: Props) => {
                         </label>
                         {userList &&
                             <div className="flex flex-col gap-4">
-                                {userList.map(u=><UserCard user={u}/>)}
+                                {userList.map(u=><UserCard key={u.id} user={u}/>)}
                             </div>
                         }
                     </section>
@@ -155,36 +160,26 @@ const fetchUsers = async (): Promise<User[]>=>{
     return users;
 }
 
-export const getServerSideProps = async () => {
-    try{
-        let response = await reviewService.getAllReviews();
-        if(!response.ok){
-            throw new Error("error fetching reviews");
-        }
-        const fetchedReviews: Review[] = await response.json();
-        const reviews = fetchedReviews.filter(r=> !r.author.isBlocked).slice(0,15)
-
-        const albumIds: string[] = [];
-        fetchedReviews.map(r=>albumIds.push(r.albumId));
-        const sortedAlbumIds = albumService.getAlbumsByFrequency(albumIds);
-
-        const albumDetails = sortedAlbumIds.map(id => id.split('_'));
-        const albums = await Promise.all(
-            albumDetails.map(([title, artist]) => 
-                albumService.fetchAlbum(title, artist)
-            )
-        );
-
-
-        return {props: {
-            reviewedAlbums: albums.slice(0,40),
-        }}
-    }catch(e){
-        console.log(e); 
-        return {props: {
-            albums: []
-        }}
+const fetchInitialAlbums = async (): Promise<Album[]> => {
+    const response = await reviewService.getAllReviews();
+    if(!response.ok){
+        throw new Error("error fetching reviews");
     }
+    const fetchedReviews: Review[] = await response.json();
+    const reviews = fetchedReviews.filter(r=> !r.author.isBlocked).slice(0,15);
+
+    const albumIds: string[] = [];
+    fetchedReviews.map(r=>albumIds.push(r.albumId));
+    const sortedAlbumIds = albumService.getAlbumsByFrequency(albumIds);
+
+    const albumDetails = sortedAlbumIds.map(id => id.split('_'));
+    const albums = await Promise.all(
+        albumDetails.map(([title, artist]) => 
+            albumService.fetchAlbum(title, artist)
+        )
+    );
+
+    return albums.slice(0,40);
 }
 
 export default Discover;

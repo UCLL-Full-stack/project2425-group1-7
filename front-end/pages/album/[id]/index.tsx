@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import reviewService from "@/services/reviewService";
 import ReviewDetails from "@/components/reviews/reviewDetails";
 import ReviewModal from "@/components/reviews/createReviewModal";
+import IconDisc from "@/components/ui/loading";
 
 const AlbumOverviewPage = () => {
 
@@ -19,7 +20,7 @@ const AlbumOverviewPage = () => {
     const [user, setUser] = useState<User>();
     const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
 
-    const { data: album, error: albumError } = useSWR<Album>(`album/${id}`, ()=>fetchAlbum(String(id)));
+    const { data: album, error: albumError, isLoading } = useSWR<Album>(`album/${id}`, ()=>fetchAlbum(String(id)));
     const { data: reviews, error: reviewError } = useSWR<Review[]>(`reviews/album/${id}`, ()=> fetchReviews(String(id)))
 
     useEffect(() => {
@@ -45,6 +46,10 @@ const AlbumOverviewPage = () => {
         setError("Failed to fetch album details.");
     }
 
+    if (reviewError) {
+        setError("Failed to fetch album reviews.");
+    }
+
     const handleReviewDetails = (id: number)=>{
         router.push(`/reviewDetails/${id}`);
     }
@@ -58,9 +63,8 @@ const AlbumOverviewPage = () => {
 
     const toggleReviewModal = () => setIsReviewModalOpen(!isReviewModalOpen);
 
-    return (
-        user && (
-                <>
+    return ( user && (
+        <>
             <Head>
                 <title>Yadig</title>
             </Head>
@@ -73,15 +77,22 @@ const AlbumOverviewPage = () => {
                 ) : (
                 <main className="flex-1 flex flex-col lg:flex-row bg-bg1 p-4 sm:p-6 lg:p-10 overflow-y-auto">
                     <div className="flex flex-col w-1/3 fixed">
-                    {album ? <AlbumOverview album={album} onReview={toggleReviewModal}/> : <div>Loading...</div>}
+                    {album ? 
+                        <AlbumOverview album={album} onReview={toggleReviewModal}/> 
+                    : (
+                        <div className="flex items-center justify-center h-48">
+                            <IconDisc className="animate-spin text-text2" width={48} height={48} />
+                        </div>
+                    )}
                     </div>
                     <div className="w-full left-0 flex flex-col ml-[40vw] items-center gap-4 ">
                     {reviews && (
                         <>
-                        <span className="text-text2 main-font text-2xl">Popular Reviews</span>
-                        {reviews.length>0 ? reviews.map(r => <ReviewDetails review={r} user={user} handleClickComment={handleReviewDetails}/>)
-                            : <p className="flex items-center main-thin text-text2">This Album hasn't been reviewed yet</p>
-                        }
+                            <span className="text-text2 main-font text-2xl">Popular Reviews</span>
+                            {reviews.length>0 
+                                ? reviews.map(r => <ReviewDetails review={r} user={user} handleClickComment={handleReviewDetails}/>)
+                                : <p className="flex items-center main-thin text-text2">This Album hasn't been reviewed yet</p>
+                            }
                         </>
 
                     )}

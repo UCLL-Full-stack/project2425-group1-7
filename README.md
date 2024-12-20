@@ -8,7 +8,7 @@ YaDig is a social media application that allows users to connect through music t
 1. create a .env file:
 ```
 APP_PORT=3030
-DATABASE_URL={YOUR_POSGRES_URL}
+DATABASE_URL={YOUR_POStGRES_URL}
 JWT_EXPIRES_HOURS=6
 JWT_SECRET=alsdjbqeiorbgq93g9o3yt2348t03utbv3-qtv1-034unt-29493t
 ```
@@ -23,12 +23,16 @@ $ npm start
 1. create a .env file:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3030
-NEXT_PUBLIC_LASTFM_API_KEY=78f1f6e5eaaf7d27216635ecedaaadc6
+NEXT_PUBLIC_LASTFM_API_KEY={LASTFM_API_KEY}
 ```
 2. run 
 ```
 $ npm i
 $ npm start
+```
+#### Testing (backend and frontend):
+```
+$npm test
 ```
 
 ### Adam Benkhazzi / Sadra Dezdar
