@@ -5,7 +5,6 @@ import AlbumCard from './albumCard';
 import { useRouter } from 'next/router';
 import { Album } from '@/types';
 
-// Add jest-dom matchers to Jest
 declare global {
     namespace jest {
         interface Matchers<R> {
@@ -15,13 +14,11 @@ declare global {
     }
 }
 
-// Mock next/router
 jest.mock('next/router', () => ({
     useRouter: jest.fn()
 }));
 
 describe('AlbumCard', () => {
-    // Setup mock router
     const mockPush = jest.fn();
     const mockUseRouter = useRouter as jest.Mock;
 
@@ -47,11 +44,9 @@ describe('AlbumCard', () => {
     it('renders album information correctly', () => {
         render(<AlbumCard album={mockAlbum} />);
 
-        // Check if album name and artist are rendered
         expect(screen.getByText('Test Album')).toBeInTheDocument();
     expect(screen.getByText('Test Artist')).toBeInTheDocument();
 
-    // Check if image is rendered with correct src and alt
     const image = screen.getByAltText('Test Album cover') as HTMLImageElement;
 expect(image).toBeInTheDocument();
 expect(image.src).toContain('extralarge.jpg');
