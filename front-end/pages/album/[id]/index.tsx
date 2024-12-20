@@ -38,17 +38,20 @@ const AlbumOverviewPage = () => {
             }
 
             router.push("/login");
+            return;
         };
         getUser();
     }, []);
 
-    if (albumError) {
-        setError("Failed to fetch album details.");
-    }
+    useEffect(()=>{
+        if (albumError) {
+            setError("Failed to fetch album details.");
+        }
 
-    if (reviewError) {
-        setError("Failed to fetch album reviews.");
-    }
+        if (reviewError) {
+            setError("Failed to fetch album reviews.");
+        }
+    },[albumError, reviewError]);
 
     const handleReviewDetails = (id: number)=>{
         router.push(`/reviewDetails/${id}`);
