@@ -154,8 +154,10 @@ const fetchListWithAlbums = async (id: number): Promise<{list: List, albums: Alb
     
     const albumDetails = list.albumIds.map(id => id.split('_'));
     const albums = await Promise.all(
-        albumDetails.map(([title, artist]) => 
-            albumService.fetchAlbum(title, artist)
+        albumDetails.map(([title, artist]) => {
+            console.log(title, artist);
+            return albumService.fetchAlbum(title, artist)
+        }
         )
     );
 

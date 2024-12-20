@@ -105,10 +105,9 @@ const ReviewDetailsPage = () => {
         mutate();
     };
 
-
-    const toggleDelete = () => {
+    const toggleDelete = (id?: number) => {
         if(!review)return;
-        setSelectedId(review.id);
+        setSelectedId(id??review.id);
         setDeleteModal(!deleteModal);
     };
 

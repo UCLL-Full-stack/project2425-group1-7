@@ -7,7 +7,7 @@ import IconLike from "@/components/ui/like";
 import listService from "@/services/listService";
 import { useEffect, useState } from "react";
 
-interface ListDetailsProps {
+interface Props {
     list: List;
     albums: Album[];
     user: User;
@@ -15,7 +15,7 @@ interface ListDetailsProps {
     onEdit?: ()=>void ;
 }
 
-const ListDetails = ({ list, albums, user, onDelete, onEdit }: ListDetailsProps) => {
+const ListDetails = ({ list, albums, user, onDelete, onEdit }: Props) => {
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [likeCount, setLikeCount] = useState<number>(0);
     const [clicked, setClicked] = useState<boolean>(false);

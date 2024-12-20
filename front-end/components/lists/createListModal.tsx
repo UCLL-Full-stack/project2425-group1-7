@@ -101,50 +101,69 @@ const ListModal = ({ isOpen, onClose, onSave, onEdit, user, list }: Props) => {
     };
 
     return (
-        <div className={`fixed inset-0 z-20  flex px-4 items-center justify-center bg-black bg-opacity-50 transition-opacity duration-100 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
-            <div className={`bg-text1 p-6 rounded-lg w-full max-w-md shadow-lg transform transition-transform duration-100 ${isOpen ? 'scale-100' : 'scale-0'}`}>
-                <h2 className="text-2xl text-text2 main-font mb-4">Create an album list</h2>
-                <label className="block mb-2 text-sm text-bg2 main-font">
-                    Title
-                    <input 
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="block bg-bg4 text-text2 w-full mt-1 p-2 rounded"
-                    />
-                </label>
-
-                <label className="block mb-4 text-sm text-bg2 main-font">
-                    Description
-                    <textarea 
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="block bg-bg4 text-text2 w-full mt-1 p-2 rounded"
-                    />
-                </label>
-                <AlbumSearch label="Albums" albums={albums} onAdd={handleAddAlbum} setQuery={setQuery} query={query}/>
-                <AlbumListCard albums={listAlbums} onRemove={handleRemoveAlbum}/>
-                {error && 
-                    <div className="w-full text-center text-text2 border-1 rounded-md bg-red-500 p-2">
-                        <span className="main-font">{error}</span>
+            <div className={`fixed inset-0 z-20 flex px-4 items-center justify-center bg-black bg-opacity-50 transition-opacity duration-100 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`bg-text1 rounded-lg w-full max-w-md shadow-lg transform transition-transform duration-100 ${isOpen ? 'scale-100' : 'scale-0'}`}>
+                    <div className="p-6 border-b border-bg4">
+                        <h2 className="text-2xl text-text2 main-font">Create an album list</h2>
                     </div>
-                }
-                <div className="flex justify-end main-font space-x-3 mt-8">
-                    <button 
-                        onClick={onClose} 
-                        className="rounded-lg main-font w-2/4 px-3 py-2 text-sm text-white hover:bg-text2 hover:text-red-500 bg-red-500 transition-colors duration-100"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        onClick={handleSave} 
-                        className="rounded-lg main-font w-2/4 px-3 py-2 main-font text-sm sm:text-base text-text2 bg-bg4 hover:bg-bg2 transition-colors duration-100"
-                    >
-                        Save
-                    </button>
+                    <div className="max-h-[calc(100vh-16rem)] overflow-y-auto p-6">
+                        <label className="block mb-2 text-sm text-bg2 main-font">
+                            Title
+                            <input 
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="block bg-bg4 text-text2 w-full mt-1 p-2 rounded"
+                            />
+                        </label>
+
+                        <label className="block mb-4 text-sm text-bg2 main-font">
+                            Description
+                            <textarea 
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="block bg-bg4 text-text2 w-full mt-1 p-2 rounded"
+                            />
+                        </label>
+
+                        <AlbumSearch 
+                            label="Albums" 
+                            albums={albums} 
+                            onAdd={handleAddAlbum} 
+                            setQuery={setQuery} 
+                            query={query}
+                        />
+
+                        <AlbumListCard 
+                            albums={listAlbums} 
+                            onRemove={handleRemoveAlbum}
+                        />
+
+                    {error && 
+                        <div className="w-full text-center text-text2 border-1 rounded-md bg-red-500 p-2">
+                            <span className="main-font">{error}</span>
+                        </div>
+                    }
+                    </div>
+
+                    <div className="p-6 border-t border-bg4">
+                        <div className="flex justify-end main-font space-x-3">
+                            <button 
+                                onClick={onClose} 
+                                className="rounded-lg main-font w-2/4 px-3 py-2 text-sm text-white hover:bg-text2 hover:text-red-500 bg-red-500 transition-colors duration-100"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleSave} 
+                                className="rounded-lg main-font w-2/4 px-3 py-2 main-font text-sm sm:text-base text-text2 bg-bg4 hover:bg-bg2 transition-colors duration-100"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </div>    
     );
 };
 
