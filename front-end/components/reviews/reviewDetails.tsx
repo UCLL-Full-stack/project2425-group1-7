@@ -16,7 +16,7 @@ type Props = {
     user: User,
     review: Review,
     handleClickComment: (id: number) => void,
-    onDelete?: ()=>void ;
+    onDelete?: (id?:number)=>void ;
     onEdit?: ()=>void ;
 }
 
@@ -145,7 +145,7 @@ const ReviewDetails = ({ user, review, handleClickComment, onEdit, onDelete }: P
             {onDelete && 
                 <span className="flex justify-center">
                     <IconDelete
-                        onClick={onDelete}
+                        onClick={()=>onDelete(review.id)}
                         className="text-bg2 hover:text-red-500 duration-100"
                         width={30} height={30}
                     />

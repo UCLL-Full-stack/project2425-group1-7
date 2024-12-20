@@ -3,25 +3,44 @@ import Header from "@/components/header";
 import ListCard from "@/components/lists/listCard";
 import ReviewCard from "@/components/reviews/reviewCard";
 import HoverTitle from "@/components/ui/hoverTitle";
+import IconDisc from "@/components/ui/loading";
 import albumService from "@/services/albumService";
 import listService from "@/services/listService";
 import reviewService from "@/services/reviewService";
 import userService from "@/services/userService";
-import { Album, List, Review, User } from "@/types/index";
+import { List, Review, User } from "@/types/index";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
 
 type Props = {
     lists: List[],
     reviews: Review[],
-    albums: Album[]
+    initialAlbumIds: string[]
 }
 
-const Home = ({ lists, reviews, albums }: Props) => {
+const fetcher = async (albumDetails: string[]) => {
+    const [title, artist] = albumDetails;
+    return albumService.fetchAlbum(title, artist);
+};
+
+const Home = ({ lists, reviews, initialAlbumIds }: Props) => {
     const router = useRouter();
     const [user, setUser] = useState<User>();
+
+    const sortedAlbumIds = albumService.getAlbumsByFrequency(initialAlbumIds);
+    const albumDetails = sortedAlbumIds.slice(0, 8).map(id => id.split('_'));
+    
+    const { data: albums, error, isLoading } = useSWR(
+        albumDetails,
+        () => Promise.all(albumDetails.map(details => fetcher(details))),
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
+        }
+    );
 
     useEffect(() => {
         const getUser = () => {
@@ -53,23 +72,22 @@ const Home = ({ lists, reviews, albums }: Props) => {
                 <Header current="home" user={user} />
                 <div className="bg-bg1 xs:p-4 lg:p-8 w-screen grid gap-3">
                     <span className="text-center main-font text-text2 sm:text-xl md:text-4xl">
-                        {user ? `welcome back ${user.username}` :( "welcome newcomer")} 
+                        {user ? `welcome back ${user.username}` : "welcome newcomer"} 
                     </span>
                     <span className="text-center yadig-italic text-text2 text-xl">
-                        {user ? "what are you digging today?":("Log in and start Digging 🎧")}
+                        {user ? "what are you digging today?" : "Log in and start Digging 🎧"}
                     </span>
                 </div>
                 <main className="flex-1 grid sm:grid-cols-1 md:grid-cols-2 gap-4 bg-bg1 xs:px-2 p-10 overflow-y-auto">
                     <section className="px-4 xs:p-2 grid items-center text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
-
                         {/* Popular Lists Section */}
                         <div className="pb-5 xs:pb-1 grid gap-6">
-                            <Link href="/feed" className="pb-5 ">
-                                <HoverTitle  text1="Popular Lists" text2="View More"/>
-                           </Link>
+                            <Link href="/feed" className="pb-5">
+                                <HoverTitle text1="Popular Lists" text2="View More"/>
+                            </Link>
 
                             <div className="slider-container">
-                            {lists.length > 0 ?(
+                            {lists.length > 0 ? (
                                 <div className="slider">
                                     {lists.slice(0, 15).map((list) => (
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
@@ -84,7 +102,7 @@ const Home = ({ lists, reviews, albums }: Props) => {
                                         <ListCard key={list.id} list={list} userId={user?.id}/>
                                     ))}
                                 </div>
-                            ):(
+                            ) : (
                                 <span>No Lists to Show</span>
                             )}
                             </div>
@@ -94,7 +112,7 @@ const Home = ({ lists, reviews, albums }: Props) => {
                         <div className="pt-5 grid gap-6">
                             <Link href="/feed" className="pb-5">
                                 <HoverTitle text1="Popular Reviews" text2="View More"/>
-                           </Link>
+                            </Link>
                             <div className="slider-container">
                                 <div className="slider">
                                     {reviews &&
@@ -121,14 +139,22 @@ const Home = ({ lists, reviews, albums }: Props) => {
                     {/* Most Reviewed Albums Section */}
                     <section className="px-4 xs:p-2 flex flex-col text-center bg-text1 shadow-lg shadow-text1 rounded-xl">
                         <Link href="/discover" className="mb-10">
-                            <HoverTitle  text1="Most Reviewed Albums" text2="View More"/>
+                            <HoverTitle text1="Most Reviewed Albums" text2="View More"/>
                         </Link>
                         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
-                            {albums &&
-                                albums.map((album) => (
-                                    <AlbumCard key={album.id} album={album} />
+                            {isLoading ? (
+                                Array(8).fill(0).map((_, index) => (
+                                    <div key={index} className="flex items-center justify-center h-48">
+                                        <IconDisc className="animate-spin text-text2" width={48} height={48} />
+                                    </div>
                                 ))
-                            }
+                            ) : error ? (
+                                <span className="col-span-full text-red-500">Error loading albums</span>
+                            ) : albums ? (
+                                albums.map((album) => (
+                                    <AlbumCard key={`${album.id}`} album={album} />
+                                ))
+                            ) : null}
                         </div>
                     </section>
                 </main>
@@ -138,41 +164,41 @@ const Home = ({ lists, reviews, albums }: Props) => {
 };
 
 export const getServerSideProps = async () => {
-    try{
+    try {
         let response = await reviewService.getAllReviews();
         if(!response.ok){
             throw new Error("error fetching reviews");
         }
         const fetchedReviews: Review[] = await response.json();
-        const reviews = fetchedReviews.filter(r=> !r.author.isBlocked).slice(0,15)
+        const reviews = fetchedReviews.filter(r => !r.author.isBlocked).slice(0,15);
 
         response = await listService.getAllLists();
         if(!response.ok){
             throw new Error("error fetching lists");
         }
         const fetchedLists: List[] = await response.json();
-        const lists = fetchedLists.filter(l=> !l.author.isBlocked).slice(0,15)
+        const lists = fetchedLists.filter(l => !l.author.isBlocked).slice(0,15);
 
         const albumIds: string[] = [];
-        fetchedReviews.map(r=>albumIds.push(r.albumId));
-        const sortedAlbumIds = albumService.getAlbumsByFrequency(albumIds);
+        fetchedReviews.map(r => albumIds.push(r.albumId));
 
-        const albumDetails = sortedAlbumIds.map(id => id.split('_'));
-        const albums = await Promise.all(
-            albumDetails.map(([title, artist]) => 
-                albumService.fetchAlbum(title, artist)
-            )
-        );
-
-        return {props: {
-            lists: lists, 
-            reviews: reviews,
-            albums: albums.slice(0,8)
-        }};
-    }catch(e){
+        return {
+            props: {
+                lists,
+                reviews,
+                initialAlbumIds: albumIds
+            }
+        };
+    } catch(e) {
         console.log(e);
-        return {props: {lists: [], reviews: [], albums: []}};
+        return {
+            props: {
+                lists: [],
+                reviews: [],
+                initialAlbumIds: []
+            }
+        };
     }
-} 
+};
 
 export default Home;

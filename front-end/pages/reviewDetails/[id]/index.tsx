@@ -50,7 +50,7 @@ const ReviewDetailsPage = () => {
         if (reviewError) {
             setError(reviewError.message);
         } else if (review?.author.isBlocked) {
-            setError("List No Longer Exists");
+            setError("Review No Longer Exists");
         } else {
             setError("");
         }
@@ -90,7 +90,7 @@ const ReviewDetailsPage = () => {
         if(!review) return;
         const response = await reviewService.deleteReview(review.id);
         if(!response){
-            setError("error deleting list");
+            setError("error deleting Review");
         }
         router.back();
     };
@@ -100,7 +100,7 @@ const ReviewDetailsPage = () => {
         if(!review) return;
         const response = await reviewService.editReview(reviewInput, review.id);
         if(!response){
-            setError("error deleting list");
+            setError("error editing Review");
         }
         mutate();
     };
@@ -117,6 +117,17 @@ const ReviewDetailsPage = () => {
 
     const isUserReview = review?.author.id === user?.id;
     const isLoading = !review && !reviewError;
+
+    if (error){
+        return(
+            <div className="flex flex-col h-screen">
+                <Header current="home" user={user} />
+                <main className="flex-1 main-font text-red-500 flex justify-center bg-bg1 p-10 overflow-y-auto">
+                    {error}
+                </main>
+            </div>
+        )
+    }
 
     return (
         <>
